@@ -1,0 +1,11 @@
+{
+  "name" : "scrpr",
+  "version" : "0.0.1",
+  "description" : "Web scraper",
+  "main" : "server.js",
+  "author" : "mrotaru",
+  "dependencies" : {
+    "request" : "latest",
+    "cheerio" : "latest"
+  }
+}
