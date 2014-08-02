@@ -1,15 +1,13 @@
 var cheerio = require('cheerio');
 
 function hotukdeals(){
-    this.name = 'hotukdeals.co.uk';
-    this.phantom = true;
+    this.name = 'hotukdeals.com';
 };
 
 hotukdeals.prototype.parse = function(html) {
     $ = cheerio.load(html);
-    console.log(html);
     $('.redesign-item-listing h2').each(function(i,el){
-        console.log(el.text());
+        console.log($(this).text());
     })
 }
 

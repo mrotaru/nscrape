@@ -7,5 +7,8 @@
   "dependencies" : {
     "request" : "latest",
     "cheerio" : "latest"
+  },
+  "optionalDependencies" : {
+    "phantom" : "latest"
   }
 }
