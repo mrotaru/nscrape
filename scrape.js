@@ -71,4 +71,7 @@ Scraper.prototype._requestScrape = function(url){
 }
 
 var scraper = new Scraper(spider_name);
+scraper.spider.on("item-scraped", function(item){
+    console.log(item.title);
+});
 scraper.scrape();
