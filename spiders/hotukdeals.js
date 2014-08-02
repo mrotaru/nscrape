@@ -2,6 +2,7 @@ var cheerio = require('cheerio');
 
 function hotukdeals(){
     this.name = 'hotukdeals.co.uk';
+    this.phantom = true;
 };
 
 hotukdeals.prototype.parse = function(html) {
