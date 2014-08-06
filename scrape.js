@@ -11,7 +11,7 @@ function Scraper(spider_name) {
 }
 
 Scraper.prototype.init = function(spider_name) {
-    var Spider = require(spider_path + '/' + spider_name + '.js');
+    var Spider = require('./node_modules/' + spider_name + '-spider');
     this.spider = new Spider();
     this.start_url = typeof this.spider.start_url == 'undefined' ? 'http://www.' + this.spider.name : this.spider.start_url;
 }
