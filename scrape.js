@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var spider_path = ('./spiders');
 
-//var proxy = "http://127.0.0.1:8888"; // will be used by Request
+var proxy = "http://127.0.0.1:8888"; // will be used by Request
 
 var spider_name =process.argv[2];
 var extractLinks = 2; // by default, extract 2 more links to be parsed
@@ -32,15 +32,18 @@ Scraper.prototype.scrape = function(url){
     while(!done) {
         console.log('scraping: ', url);   
         this._scrapedLinks++;
-        if(typeof this.spider.more == 'function' && this._scrapedLinks < extractLinks ) {
-            scrape(this.spider.more());
+        if(typeof this.spider.nextUrl == 'function' && this._scrapedLinks < extractLinks ) {
+            this._scrape(this.spider.nextUrl());
+        } else if(typeof(this.spider.nextUrl === 'undefined')) {
+            this._scrape(this.spider.baseUrl);
+            done = true;
         } else {
+            console.log('enough');
             done = true;
         }
     }
 }
 
-// returns a promise
 Scraper.prototype._scrape = function(url){
     if(this.spider.phantom) {
         this._phantomScrape(url);
@@ -49,7 +52,6 @@ Scraper.prototype._scrape = function(url){
     }
 }
 
-// promisify
 Scraper.prototype._phantomScrape = function(url){
     var self = this;
     var _phantom = require("phantom");
@@ -76,7 +78,6 @@ Scraper.prototype._phantomScrape = function(url){
     });
 }
 
-// promisify
 Scraper.prototype._requestScrape = function(url){
 
     var request_options = {};
