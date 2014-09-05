@@ -1,5 +1,6 @@
 var request = require('request');
 var fs = require('fs');
+var winston = require('winston');
 
 var spider_path = ('./spiders');
 
@@ -8,6 +9,24 @@ var proxy = "http://127.0.0.1:8888"; // will be used by Request
 var spider_name =process.argv[2];
 var extractLinks = 2; // by default, extract 2 more links to be parsed
 
+// setup logging
+winston.loggers.add('scraper', {
+    console: {
+        level: 'info',
+        colorize: 'true',
+        label: 'scraper'
+    }
+});
+winston.loggers.add('spider', {
+    console: {
+        level: 'info',
+        colorize: 'true',
+        label: 'spider'
+    }
+});
+
+var log = winston.loggers.get('scraper');
+
 function Scraper(spider_name) {
     this.init(spider_name);
     this._scrapedLinks = 0;
@@ -15,11 +34,14 @@ function Scraper(spider_name) {
 
 Scraper.prototype.init = function(spider_name) {
     var Spider = null;
+    log.log('info','initializing scraper: %s', spider_name);
     // try to load spider from local dir
     var localPath = spider_path + '/' + spider_name;
     if(fs.existsSync(localPath)) {
+        log.log('info','loading scraper %s from ', spider_name, localPath);
         Spider = require(localPath);
     } else {
+        log.log('info','loading scraper %s from ', spider_name, spider_name + '-spider');
         Spider = require('./node_modules/' + spider_name + '-spider');
     }
     this.spider = new Spider();
@@ -30,7 +52,7 @@ Scraper.prototype.scrape = function(url){
     var url = typeof url == 'undefined' ? this.start_url : url;
     var done = false;
     while(!done) {
-        console.log('scraping: ', url);   
+        log.log('info','scraping: %s', url);
         this._scrapedLinks++;
         if(typeof this.spider.nextUrl == 'function' && this._scrapedLinks < extractLinks ) {
             this._scrape(this.spider.nextUrl(), this.scrape);
@@ -89,15 +111,18 @@ Scraper.prototype._requestScrape = function(url, callback){
         request_options,
         function(err, resp, body) {
             if (!err && resp.statusCode == 200) {
-                console.log('200');
+                log.log('info', 'got data back from %s', request_options.uri);
                 self.spider.parse(body);
                 if(typeof self.spider.nextUrl == 'function' && tupeof(callback) == 'function' ) {
                     callback(self.spider.nextUrl());
                 }
             } else {
-                console.log('request failed.');
-                if(err) console.log(err);
-                if(resp) console.log(resp);
+                if(err) {
+                    log.log('error', 'request failed: %s', err.code);
+                }
+                if(resp) {
+                    log.log('error', 'request failed; resp: %s', resp);
+                }
             }
         }
     )

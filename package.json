@@ -1,14 +1,15 @@
 {
-  "name" : "scrpr",
-  "version" : "0.0.1",
-  "description" : "Web scraper",
-  "main" : "server.js",
-  "author" : "mrotaru",
-  "dependencies" : {
-    "request" : "latest",
-    "cheerio" : "latest"
+  "name": "scrpr",
+  "version": "0.0.1",
+  "description": "Web scraper",
+  "main": "server.js",
+  "author": "mrotaru",
+  "dependencies": {
+    "request": "latest",
+    "cheerio": "latest",
+    "winston": "^0.7.3"
   },
-  "optionalDependencies" : {
-    "phantom" : "latest"
+  "optionalDependencies": {
+    "phantom": "latest"
   }
 }
