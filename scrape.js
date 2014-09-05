@@ -4,7 +4,7 @@ var winston = require('winston');
 
 var spider_path = ('./spiders');
 
-var proxy = "http://127.0.0.1:8888"; // will be used by Request
+//var proxy = "http://127.0.0.1:8888"; // will be used by Request
 
 var spider_name =process.argv[2];
 var extractLinks = 2; // by default, extract 2 more links to be parsed
@@ -50,19 +50,16 @@ Scraper.prototype.init = function(spider_name) {
 
 Scraper.prototype.scrape = function(url){
     var url = typeof url == 'undefined' ? this.start_url : url;
-    var done = false;
-    while(!done) {
-        log.log('info','scraping: %s', url);
-        this._scrapedLinks++;
-        if(typeof this.spider.nextUrl == 'function' && this._scrapedLinks < extractLinks ) {
-            this._scrape(this.spider.nextUrl(), this.scrape);
-        } else if(typeof(this.spider.nextUrl === 'undefined')) {
-            this._scrape(this.spider.baseUrl);
-            done = true;
-        } else {
-            console.log('enough');
-            done = true;
-        }
+    log.info('scraping: %s', url);
+    this._scrapedLinks++;
+    if(typeof this.spider.nextUrl == 'function' && this._scrapedLinks < extractLinks ) {
+        this._scrape(this.spider.nextUrl(), this.scrape);
+    } else if(typeof(this.spider.nextUrl === 'undefined')) {
+        this._scrape(this.spider.baseUrl);
+        done = true;
+    } else {
+        console.log('enough');
+        done = true;
     }
 }
 
@@ -113,15 +110,15 @@ Scraper.prototype._requestScrape = function(url, callback){
             if (!err && resp.statusCode == 200) {
                 log.log('info', 'got data back from %s', request_options.uri);
                 self.spider.parse(body);
-                if(typeof self.spider.nextUrl == 'function' && tupeof(callback) == 'function' ) {
+                if(typeof self.spider.nextUrl == 'function' && typeof callback == 'function' ) {
                     callback(self.spider.nextUrl());
                 }
             } else {
                 if(err) {
-                    log.log('error', 'request failed: %s', err.code);
+                    log.error('request [%s] failed: %s', request_options.uri, err.code);
                 }
                 if(resp) {
-                    log.log('error', 'request failed; resp: %s', resp);
+                    log.error('request [%s] failed; resp: %s', request_options.uri, resp);
                 }
             }
         }
