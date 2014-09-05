@@ -33,7 +33,7 @@ Scraper.prototype.scrape = function(url){
         console.log('scraping: ', url);   
         this._scrapedLinks++;
         if(typeof this.spider.nextUrl == 'function' && this._scrapedLinks < extractLinks ) {
-            this._scrape(this.spider.nextUrl());
+            this._scrape(this.spider.nextUrl(), this.scrape);
         } else if(typeof(this.spider.nextUrl === 'undefined')) {
             this._scrape(this.spider.baseUrl);
             done = true;
@@ -44,15 +44,15 @@ Scraper.prototype.scrape = function(url){
     }
 }
 
-Scraper.prototype._scrape = function(url){
+Scraper.prototype._scrape = function(url, callback){
     if(this.spider.phantom) {
-        this._phantomScrape(url);
+        this._phantomScrape(url, callback);
     } else {
-        this._requestScrape(url);
+        this._requestScrape(url, callback);
     }
 }
 
-Scraper.prototype._phantomScrape = function(url){
+Scraper.prototype._phantomScrape = function(url, callback){
     var self = this;
     var _phantom = require("phantom");
     _phantom.create(function(phantom){
@@ -78,7 +78,7 @@ Scraper.prototype._phantomScrape = function(url){
     });
 }
 
-Scraper.prototype._requestScrape = function(url){
+Scraper.prototype._requestScrape = function(url, callback){
 
     var request_options = {};
     request_options.uri = url;
@@ -88,8 +88,16 @@ Scraper.prototype._requestScrape = function(url){
     request(
         request_options,
         function(err, resp, body) {
-           if (!err && resp.statusCode == 200) {
+            if (!err && resp.statusCode == 200) {
+                console.log('200');
                 self.spider.parse(body);
+                if(typeof self.spider.nextUrl == 'function' && tupeof(callback) == 'function' ) {
+                    callback(self.spider.nextUrl());
+                }
+            } else {
+                console.log('request failed.');
+                if(err) console.log(err);
+                if(resp) console.log(resp);
             }
         }
     )
