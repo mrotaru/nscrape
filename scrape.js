@@ -14,7 +14,14 @@ winston.loggers.add('scraper', {
     console: {
         level: 'info',
         colorize: 'true',
-        label: 'scraper'
+        label: 'scraper',
+    }
+});
+winston.loggers.add('item', {
+    console: {
+        level: 'info',
+        colorize: 'true',
+        label: 'item',
     }
 });
 winston.loggers.add('spider', {
@@ -26,6 +33,7 @@ winston.loggers.add('spider', {
 });
 
 var log = winston.loggers.get('scraper');
+var log_item = winston.loggers.get('item');
 
 function Scraper(spider_name) {
     this.init(spider_name);
@@ -108,7 +116,7 @@ Scraper.prototype._requestScrape = function(url, callback){
         request_options,
         function(err, resp, body) {
             if (!err && resp.statusCode == 200) {
-                log.log('info', 'got data back from %s', request_options.uri);
+                log.info('got data back from %s', request_options.uri);
                 self.spider.parse(body);
                 if(typeof self.spider.nextUrl == 'function' && typeof callback == 'function' ) {
                     callback(self.spider.nextUrl());
@@ -127,6 +135,6 @@ Scraper.prototype._requestScrape = function(url, callback){
 
 var scraper = new Scraper(spider_name);
 scraper.spider.on("item-scraped", function(item){
-    console.log(item.title);
+    log_item.info('%j',item, {});
 });
 scraper.scrape();
