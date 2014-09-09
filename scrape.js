@@ -17,6 +17,7 @@ winston.loggers.add('scraper', {
         label: 'scraper',
     }
 });
+
 winston.loggers.add('item', {
     console: {
         level: 'info',
@@ -24,6 +25,7 @@ winston.loggers.add('item', {
         label: 'item',
     }
 });
+
 winston.loggers.add('spider', {
     console: {
         level: 'info',
@@ -34,6 +36,7 @@ winston.loggers.add('spider', {
 
 var log = winston.loggers.get('scraper');
 var log_item = winston.loggers.get('item');
+winston.addColors({info: 'grey'});
 
 function Scraper(spider_name) {
     this.init(spider_name);
