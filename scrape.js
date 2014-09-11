@@ -7,7 +7,7 @@ var spider_path = ('./spiders');
 //var proxy = "http://127.0.0.1:8888"; // will be used by Request
 
 var spider_name =process.argv[2];
-var extractLinks = 2; // by default, extract 2 more links to be parsed
+var extractLinks = 2; // by default, scrape 2 pages
 
 // setup logging
 winston.loggers.add('scraper', {
@@ -44,6 +44,7 @@ function Scraper(spider_name) {
 }
 
 Scraper.prototype.init = function(spider_name) {
+    var self = this;
     var Spider = null;
     log.log('info','initializing scraper: %s', spider_name);
     // try to load spider from local dir
@@ -55,18 +56,31 @@ Scraper.prototype.init = function(spider_name) {
         log.log('info','loading scraper %s from ', spider_name, spider_name + '-spider');
         Spider = require('./node_modules/' + spider_name + '-spider');
     }
-    this.spider = new Spider();
-    this.start_url = typeof this.spider.start_url == 'undefined' ? 'http://www.' + this.spider.name : this.spider.start_url;
+    self.spider = new Spider();
+    self.start_url = typeof this.spider.start_url == 'undefined' ? 'http://www.' + this.spider.name : this.spider.start_url;
 }
 
 Scraper.prototype.scrape = function(url){
-    var url = typeof url == 'undefined' ? this.start_url : url;
-    log.info('scraping: %s', url);
-    this._scrapedLinks++;
-    if(typeof this.spider.nextUrl == 'function' && this._scrapedLinks < extractLinks ) {
-        this._scrape(this.spider.nextUrl(), this.scrape);
-    } else if(typeof(this.spider.nextUrl === 'undefined')) {
-        this._scrape(this.spider.baseUrl);
+
+    log.info('scrape called with %s',url);
+
+    var self = this;
+    var spider = self.spider;
+
+    var hasNextUrl = typeof(spider.nextUrl) == 'function' ? true : false;
+    var needMoreUrls = self._scrapedLinks < extractLinks ? true: false;
+    var haveUrlArg = typeof(url) != 'undefined' ? true: false;
+
+    self._scrapedLinks++;
+
+    if(haveUrlArg) {
+        self._scrape(url);
+        done = true;
+    } else if(!haveUrlArg && hasNextUrl && needMoreUrls ) {
+        self._scrape(self.spider.nextUrl(), self.scrape);
+    } else if(!haveUrlArg && !hasNextUrl) {
+        var url = self.start_url;
+        self._scrape(self.spider.baseUrl);
         done = true;
     } else {
         console.log('enough');
@@ -74,15 +88,16 @@ Scraper.prototype.scrape = function(url){
     }
 }
 
-Scraper.prototype._scrape = function(url, callback){
+Scraper.prototype._scrape = function(url){
+    log.info('_scrape called with %s',url);
     if(this.spider.phantom) {
-        this._phantomScrape(url, callback);
+        this._phantomScrape(url);
     } else {
-        this._requestScrape(url, callback);
+        this._requestScrape(url);
     }
 }
 
-Scraper.prototype._phantomScrape = function(url, callback){
+Scraper.prototype._phantomScrape = function(url){
     var self = this;
     var _phantom = require("phantom");
     _phantom.create(function(phantom){
@@ -108,7 +123,7 @@ Scraper.prototype._phantomScrape = function(url, callback){
     });
 }
 
-Scraper.prototype._requestScrape = function(url, callback){
+Scraper.prototype._requestScrape = function(url){
 
     var request_options = {};
     request_options.uri = url;
@@ -121,8 +136,8 @@ Scraper.prototype._requestScrape = function(url, callback){
             if (!err && resp.statusCode == 200) {
                 log.info('got data back from %s', request_options.uri);
                 self.spider.parse(body);
-                if(typeof self.spider.nextUrl == 'function' && typeof callback == 'function' ) {
-                    callback(self.spider.nextUrl());
+                if(typeof self.spider.nextUrl == 'function') {
+                    self.scrape();
                 }
             } else {
                 if(err) {
