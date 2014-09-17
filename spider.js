@@ -19,6 +19,10 @@ function Spider(){
 
 util.inherits(Spider, EventEmitter);
 
+Spider.prototype.addItemType = function(itemType){
+    this.itemTypes.push(itemType);
+}
+
 Spider.prototype.parse = function(html) {
     log.info('parsing %d bytes', html.length);
     var self = this;
@@ -38,10 +42,6 @@ Spider.prototype.parse = function(html) {
             self.emit("item-scraped",item);
         })
     });
-}
-
-Spider.prototype.addItemType = function(itemType){
-    itemTypes.push(itemType);
 }
 
 // Get the url to the next page

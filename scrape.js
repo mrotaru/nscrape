@@ -46,18 +46,22 @@ function Scraper(spider_name) {
 Scraper.prototype.init = function(spider_name) {
     var self = this;
     var Spider = null;
-    // try to load spider from local dir
-    var localPath = spider_path + '/' + spider_name;
-    if(fs.existsSync(localPath)) {
-        log.log('info','loading spider %s from ', spider_name, localPath);
-        Spider = require(localPath);
+    if(fs.existsSync('./' + spider_name)){
+        Spider = require('./' + spider_name);
     } else {
-        log.log('info','trying to load spider %s from ', spider_name, spider_name + '-spider');
-        try {
-            Spider = require('./node_modules/' + spider_name + '-spider');
-        } catch(e){
-            log.error('could not load spider "%s": %s', spider_name, e.code);
-            process.exit(1);
+        // try to load spider from local dir
+        var localPath = spider_path + '/' + spider_name;
+        if(fs.existsSync(localPath)) {
+            log.log('info','loading spider %s from ', spider_name, localPath);
+            Spider = require(localPath);
+        } else {
+            log.log('info','trying to load spider %s from ', spider_name, spider_name + '-spider');
+            try {
+                Spider = require('./node_modules/' + spider_name + '-spider');
+            } catch(e){
+                log.error('could not load spider "%s": %s', spider_name, e.code);
+                process.exit(1);
+            }
         }
     }
     self.spider = new Spider();
