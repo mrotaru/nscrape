@@ -10,9 +10,8 @@ function Spider(){
     EventEmitter.call(this);
     this.name = '';
     this.baseUrl = '';
-
-    // set inside `parse`
     this.items = [];
+    this.itemTypes = [];
     this._html = null;
     this.$ = null;
     this.currentPage = null;
@@ -25,12 +24,24 @@ Spider.prototype.parse = function(html) {
     var self = this;
     self._html = html;
     self.$ = cheerio.load(html);
-    self.$('.redesign-item-listing h2').each(function(i,el){
-        var item = {};
-        item.title = self.$(this).text();
-        self.items.push(item);
-        self.emit("item-scraped",item);
-    })
+
+    itemTypes.forEach(function(itemType){
+        log.info('extracting \'%s\' items', itemType.name);
+        self.$(itemType.container).find(itemType.selector).each(function(i,el){
+            var item = {};
+            for (var prop in itemType.properties) {
+                item[prop] = self.$(el).find(itemType.properties.prop.selector).text();
+            }
+
+            item.title = self.$(this).text();
+            self.items.push(item);
+            self.emit("item-scraped",item);
+        })
+    });
+}
+
+Spider.prototype.addItemType = function(itemType){
+    itemTypes.push(itemType);
 }
 
 // Get the url to the next page
