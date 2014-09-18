@@ -26,7 +26,7 @@ Spider.prototype.addItemType = function(itemType){
 Spider.prototype.extract(el, descriptor){
     var self = this;
     var css = descriptor.css;
-    var what = descriptor.extract;
+    var what = 'extract' in descriptor ? descriptor.extract : 'text';
     switch (what) {
         case 'href':
             return el.attr('href');
