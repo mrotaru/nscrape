@@ -64,7 +64,7 @@ Scraper.prototype.init = function(spider_name) {
             }
         }
     }
-    self.spider = new Spider();
+    self.spider = Spider;
     self.start_url = typeof this.spider.start_url == 'undefined' ? 'http://www.' + this.spider.name : this.spider.start_url;
 }
 
@@ -85,13 +85,19 @@ Scraper.prototype.scrape = function(url){
         self._scrape(url);
         done = true;
     } else if(!haveUrlArg && hasNextUrl && needMoreUrls ) {
-        self._scrape(self.spider.nextUrl(), self.scrape);
+        var nextUrl = spider.nextUrl();
+        if(typeof(nextUrl) === 'string'){
+        } else if(typeof(nextUrl) === 'object'){
+        } else {
+            log.error('spider.nextUrl must return object or string');
+            process.exit(1);
+        }
+        self._scrape(nextUrl, self.scrape);
     } else if(!haveUrlArg && !hasNextUrl) {
         var url = self.start_url;
         self._scrape(self.spider.baseUrl);
         done = true;
     } else {
-        console.log('enough');
         done = true;
     }
 }

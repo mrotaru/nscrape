@@ -23,6 +23,9 @@ Spider.prototype.addItemType = function(itemType){
     this.itemTypes.push(itemType);
 }
 
+Spider.prototype.extract(haystack, descriptor){
+}
+
 Spider.prototype.parse = function(html) {
     log.info('parsing %d bytes', html.length);
     var self = this;
@@ -37,7 +40,6 @@ Spider.prototype.parse = function(html) {
                 item[prop] = self.$(el).find(itemType.properties.prop.selector).text();
             }
 
-            item.title = self.$(this).text();
             self.items.push(item);
             self.emit("item-scraped",item);
         })
