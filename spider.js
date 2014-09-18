@@ -23,7 +23,7 @@ Spider.prototype.addItemType = function(itemType){
     this.itemTypes.push(itemType);
 }
 
-Spider.prototype.extract(el, descriptor){
+Spider.prototype.extract = function(el, descriptor){
     var self = this;
     var css = descriptor.css;
     var what = 'extract' in descriptor ? descriptor.extract : 'text';
@@ -59,6 +59,10 @@ Spider.prototype.parse = function(html) {
     });
 }
 
+Spider.prototype.hasNextUrl = function(){
+    return this.hasOwnProperty('nextUrlDescriptor') || this.hasOwnProperty('nextUrl');
+}
+
 // Get the url to the next page
 Spider.prototype.nextUrl = function() {
     var self = this;
@@ -67,10 +71,13 @@ Spider.prototype.nextUrl = function() {
         log.info('info','setting currentPate to 1');
         return self.baseUrl;
     } else {
-//        this.currentPage = parseInt(this.$('.redesign-pagination selected').text());
         log.info('currentPage: %s', self.currentPage);
         self.currentPage = self.currentPage+1;
-        return this.baseUrl + '/?page=' + self.currentPage.toString();
+        if(self.hasOwnProperty('nextUrlDescriptor'){
+            return self.extract(self.$('body'), self.nextUrlDescriptor);
+        }) else {
+            return null;
+        }
     }
 }
 
