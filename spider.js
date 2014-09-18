@@ -23,7 +23,20 @@ Spider.prototype.addItemType = function(itemType){
     this.itemTypes.push(itemType);
 }
 
-Spider.prototype.extract(haystack, descriptor){
+Spider.prototype.extract(el, descriptor){
+    var self = this;
+    var css = descriptor.css;
+    var what = descriptor.extract;
+    switch (what) {
+        case 'href':
+            return el.attr('href');
+            break;
+        case 'text':
+            return el.text();
+            break;
+        default:
+            return null;
+    }
 }
 
 Spider.prototype.parse = function(html) {
@@ -37,7 +50,7 @@ Spider.prototype.parse = function(html) {
         self.$(itemType.container).find(itemType.selector).each(function(i,el){
             var item = {};
             for (var prop in itemType.properties) {
-                item[prop] = self.$(el).find(itemType.properties.prop.selector).text();
+                item[prop] = self.extract(el, itemType.properties[prop]);
             }
 
             self.items.push(item);

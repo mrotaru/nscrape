@@ -91,6 +91,7 @@ Scraper.prototype.scrape = function(url){
         } else {
             log.error('spider.nextUrl must return object or string');
             process.exit(1);
+            
         }
         self._scrape(nextUrl, self.scrape);
     } else if(!haveUrlArg && !hasNextUrl) {
