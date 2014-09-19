@@ -26,6 +26,7 @@ Spider.prototype.addItemType = function(itemType){
 Spider.prototype.extract = function(el, descriptor){
     var self = this;
     var css = descriptor.css;
+    log.info('info','extracting %s', css);
     var what = 'extract' in descriptor ? descriptor.extract : 'text';
     switch (what) {
         case 'href':
@@ -41,12 +42,16 @@ Spider.prototype.extract = function(el, descriptor){
 
 Spider.prototype.parse = function(html) {
     log.info('parsing %d bytes', html.length);
+
     var self = this;
     self._html = html;
     self.$ = cheerio.load(html);
 
-    itemTypes.forEach(function(itemType){
+    self.itemTypes.forEach(function(itemType){
         log.info('extracting \'%s\' items', itemType.name);
+        log.info('container: ', itemType.container);
+        log.info('selector: ', itemType.selector);
+        var itemsScraped = 0;
         self.$(itemType.container).find(itemType.selector).each(function(i,el){
             var item = {};
             for (var prop in itemType.properties) {
@@ -55,7 +60,11 @@ Spider.prototype.parse = function(html) {
 
             self.items.push(item);
             self.emit("item-scraped",item);
+            itemsScraped++;
         })
+        if(!itemsScraped) {
+            log.warn('no items were scraped.');
+        }
     });
 }
 
@@ -64,8 +73,10 @@ Spider.prototype.hasNextUrl = function(){
 }
 
 // Get the url to the next page
-Spider.prototype.nextUrl = function() {
+Spider.prototype.getNextUrl = function() {
     var self = this;
+    log.info('getting nextUrl');
+    if(self.nextUrl) return self.nextUrl();
     if(self.currentPage === null) {
         self.currentPage = 1;
         log.info('info','setting currentPate to 1');
@@ -73,9 +84,9 @@ Spider.prototype.nextUrl = function() {
     } else {
         log.info('currentPage: %s', self.currentPage);
         self.currentPage = self.currentPage+1;
-        if(self.hasOwnProperty('nextUrlDescriptor'){
+        if(self.hasOwnProperty('nextUrlDescriptor')){
             return self.extract(self.$('body'), self.nextUrlDescriptor);
-        }) else {
+        } else {
             return null;
         }
     }

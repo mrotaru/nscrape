@@ -75,7 +75,7 @@ Scraper.prototype.scrape = function(url){
     var self = this;
     var spider = self.spider;
 
-    var hasNextUrl = typeof(spider.nextUrl) == 'function' ? true : false;
+    var hasNextUrl = spider.hasNextUrl();
     var needMoreUrls = self._scrapedLinks < extractLinks ? true: false;
     var haveUrlArg = typeof(url) != 'undefined' ? true: false;
 
@@ -85,14 +85,7 @@ Scraper.prototype.scrape = function(url){
         self._scrape(url);
         done = true;
     } else if(!haveUrlArg && hasNextUrl && needMoreUrls ) {
-        var nextUrl = spider.nextUrl();
-        if(typeof(nextUrl) === 'string'){
-        } else if(typeof(nextUrl) === 'object'){
-        } else {
-            log.error('spider.nextUrl must return object or string');
-            process.exit(1);
-            
-        }
+        var nextUrl = spider.getNextUrl();
         self._scrape(nextUrl, self.scrape);
     } else if(!haveUrlArg && !hasNextUrl) {
         var url = self.start_url;
