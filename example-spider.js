@@ -11,7 +11,7 @@ function Reddit() {
     this.baseUrl = 'http://www.reddit.com/r/javascript';
 
     this.nextUrlDescriptor = {
-        css: 'span.nextprev a.next',
+        selector: 'span.nextprev a.next',
         extract: 'href'
     };
 }
@@ -22,7 +22,7 @@ var reddit = new Reddit();
 
 reddit.addItemType({
     name: "link",
-    container: '.sitelisting',
+    container: '.linklisting',
     selector: '.thing',
     properties: {
         title: {

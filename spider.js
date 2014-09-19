@@ -23,11 +23,19 @@ Spider.prototype.addItemType = function(itemType){
     this.itemTypes.push(itemType);
 }
 
-Spider.prototype.extract = function(el, descriptor){
+// 1 arg: descriptor, use self.$ as ctx
+Spider.prototype.extract = function(descriptor, ctx){
+    var args = Array.prototype.slice.call(arguments);
+    var descriptor = args.shift();
+    var ctx = args.shift() || self.$;
+    var selector = descriptor.selector
     var self = this;
-    var css = descriptor.css;
-    log.info('info','extracting %s', css);
     var what = 'extract' in descriptor ? descriptor.extract : 'text';
+
+    el = self.$(ctx).find(selector);
+    
+    log.debug('extracting %s', selector);
+
     switch (what) {
         case 'href':
             return el.attr('href');
@@ -45,23 +53,34 @@ Spider.prototype.parse = function(html) {
 
     var self = this;
     self._html = html;
-    self.$ = cheerio.load(html);
+    var $ = self.$ = cheerio.load(html);
 
     self.itemTypes.forEach(function(itemType){
+
         log.info('extracting \'%s\' items', itemType.name);
-        log.info('container: ', itemType.container);
+
+        var containerSelector = itemType.container || 'body';
+        log.info('container: ', containerSelector);
         log.info('selector: ', itemType.selector);
         var itemsScraped = 0;
-        self.$(itemType.container).find(itemType.selector).each(function(i,el){
+
+        var container = $(containerSelector);
+        if(!container.length) {
+            log.error('Container not found: "%s"', containerSelector);
+            process.exit(1);
+        }
+
+        container.find(itemType.selector).each(function(i,el){
             var item = {};
             for (var prop in itemType.properties) {
-                item[prop] = self.extract(el, itemType.properties[prop]);
+                item[prop] = self.extract(itemType.properties[prop], el);
             }
 
             self.items.push(item);
             self.emit("item-scraped",item);
             itemsScraped++;
         })
+
         if(!itemsScraped) {
             log.warn('no items were scraped.');
         }
