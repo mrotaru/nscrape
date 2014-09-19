@@ -25,14 +25,16 @@ Spider.prototype.addItemType = function(itemType){
 
 // 1 arg: descriptor, use self.$ as ctx
 Spider.prototype.extract = function(descriptor, ctx){
+    var self = this;
     var args = Array.prototype.slice.call(arguments);
     var descriptor = args.shift();
     var ctx = args.shift() || self.$;
     var selector = descriptor.selector
-    var self = this;
     var what = 'extract' in descriptor ? descriptor.extract : 'text';
 
-    el = self.$(ctx).find(selector);
+//    el = self.$(ctx).find(selector);
+    
+    el = ctx.find(selector);
     
     log.debug('extracting %s', selector);
 
@@ -98,13 +100,17 @@ Spider.prototype.getNextUrl = function() {
     if(self.nextUrl) return self.nextUrl();
     if(self.currentPage === null) {
         self.currentPage = 1;
-        log.info('info','setting currentPate to 1');
+        log.info('setting currentPate to 1');
         return self.baseUrl;
     } else {
         log.info('currentPage: %s', self.currentPage);
         self.currentPage = self.currentPage+1;
         if(self.hasOwnProperty('nextUrlDescriptor')){
-            return self.extract(self.$('body'), self.nextUrlDescriptor);
+            var ctx = self.$('body');
+            console.log(self.nextUrlDescriptor);
+            var ret = self.extract(self.nextUrlDescriptor);
+            log.info('nextUrl: ', ret);
+            return ret;
         } else {
             return null;
         }

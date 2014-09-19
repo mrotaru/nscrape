@@ -76,6 +76,7 @@ Scraper.prototype.scrape = function(url){
     var spider = self.spider;
 
     var hasNextUrl = spider.hasNextUrl();
+    log.info('has nextUrl: ', hasNextUrl);
     var needMoreUrls = self._scrapedLinks < extractLinks ? true: false;
     var haveUrlArg = typeof(url) != 'undefined' ? true: false;
 
@@ -133,18 +134,19 @@ Scraper.prototype._phantomScrape = function(url){
 
 Scraper.prototype._requestScrape = function(url){
 
+    var self = this;
     var request_options = {};
+    var spider = self.spider;
     request_options.uri = url;
     request_options.proxy = typeof proxy != 'undefined' ? proxy : null;
 
-    var self = this;
     request(
         request_options,
         function(err, resp, body) {
             if (!err && resp.statusCode == 200) {
                 log.info('got data back from %s', request_options.uri);
-                self.spider.parse(body);
-                if(typeof self.spider.nextUrl == 'function') {
+                spider.parse(body);
+                if(spider.hasNextUrl()) {
                     self.scrape();
                 }
             } else {
