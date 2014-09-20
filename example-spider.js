@@ -11,7 +11,7 @@ function Reddit() {
     this.baseUrl = 'http://www.reddit.com/r/javascript';
 
     this.nextUrlDescriptor = {
-        selector: 'span.nextprev a.next',
+        selector: 'span.nextprev a',
         extract: 'href'
     };
 }

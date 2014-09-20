@@ -28,13 +28,15 @@ Spider.prototype.extract = function(descriptor, ctx){
     var self = this;
     var args = Array.prototype.slice.call(arguments);
     var descriptor = args.shift();
-    var ctx = args.shift() || self.$;
+    var ctx = args.shift() || 'body';
     var selector = descriptor.selector
     var what = 'extract' in descriptor ? descriptor.extract : 'text';
 
-//    el = self.$(ctx).find(selector);
-    
-    el = ctx.find(selector);
+    el = self.$(ctx).find(selector);
+    if(!el.length) {
+        log.error('cannot find: ', selector);
+        return null;
+    }
     
     log.debug('extracting %s', selector);
 
@@ -106,8 +108,6 @@ Spider.prototype.getNextUrl = function() {
         log.info('currentPage: %s', self.currentPage);
         self.currentPage = self.currentPage+1;
         if(self.hasOwnProperty('nextUrlDescriptor')){
-            var ctx = self.$('body');
-            console.log(self.nextUrlDescriptor);
             var ret = self.extract(self.nextUrlDescriptor);
             log.info('nextUrl: ', ret);
             return ret;
