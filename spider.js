@@ -27,10 +27,17 @@ Spider.prototype.addItemType = function(itemType){
 Spider.prototype.extract = function(descriptor, ctx){
     var self = this;
     var args = Array.prototype.slice.call(arguments);
+
     var descriptor = args.shift();
     var ctx = args.shift() || 'body';
-    var selector = descriptor.selector
-    var what = 'extract' in descriptor ? descriptor.extract : 'text';
+
+    var selector =typeof(descriptor) === 'string' ? descriptor : descriptor.selector;
+    var what = '';
+    if(typeof(descriptor) === 'string'){
+        what = 'text';
+    } else {
+        what = 'extract' in descriptor ? descriptor.extract : 'text';
+    }
 
     el = self.$(ctx).find(selector);
     if(!el.length) {
