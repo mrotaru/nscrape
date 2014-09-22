@@ -1,6 +1,3 @@
-//
-// Note: this doesn't work yet !
-//
 var util         = require("util");
 
 var spider = require('./spider.js');

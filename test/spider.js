@@ -13,7 +13,6 @@ describe('Spider', function(){
                     }
                 });
                 spider.parse('<body><div class="article"><h1 class="title">Foo</h1></div></body>').then(function(items){
-//                    console.log(items);
                     expect(items).to.be.a('array');
                     expect(items).to.have.length(1);
                     expect(items[0]).to.deep.equal({title: 'Foo'});
