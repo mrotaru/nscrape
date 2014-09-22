@@ -1,6 +1,6 @@
 var util         = require("util");
 
-var spider = require('./spider.js');
+var spider = require('../spider.js');
 
 function Reddit() {
     Reddit.super_.call(this);
