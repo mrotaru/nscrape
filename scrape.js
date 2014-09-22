@@ -7,7 +7,7 @@ var spider_path = ('./spiders');
 //var proxy = "http://127.0.0.1:8888"; // will be used by Request
 
 var spider_name =process.argv[2];
-var extractLinks = 2; // by default, scrape 2 pages
+var extractLinks = 1; // by default, scrape 2 pages
 
 // setup logging
 winston.loggers.add('scraper', {
@@ -162,7 +162,48 @@ Scraper.prototype._requestScrape = function(url){
 }
 
 var scraper = new Scraper(spider_name);
-scraper.spider.on("item-scraped", function(item){
-    log_item.info('%j',item, {});
-});
-scraper.scrape();
+
+// web interface
+var web = 0;
+var app = null;
+if(process.argv[3] === '--web'){
+    web = 1;
+    var express = require('express');
+    var app = express();
+    var server = require('http').Server(app);
+    var io = require('socket.io')(server);
+
+    app.engine('jade', require('jade').__express);
+    app.set('views', './web')
+    app.set('view engine', 'jade')
+    app.use(express.static(__dirname + '/web'));
+
+    app.get('/', function (req, res) {
+        res.render('index');
+    })
+
+    scraper.spider.on("item-scraped", function(item){
+        io.emit("item-scraped", item);
+    });
+
+    io.on('connection', function (socket) {
+        socket.on('my other event', function (data) {
+            console.log(data);
+        });
+
+        socket.on('start', function(socket){
+            console.log('start from web interface');
+            scraper.scrape();
+        });
+    });
+
+
+    server.listen(80, function(){
+        console.log('listening on *:80');
+    });
+} else {
+    scraper.scrape();
+    scraper.spider.on("item-scraped", function(item){
+        log_item.info('%j',item, {});
+    });
+}
