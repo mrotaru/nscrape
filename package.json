@@ -10,9 +10,14 @@
     "winston": "^0.7.3",
     "express": "^4.9.4",
     "socket.io": "^1.1.0",
-    "jade": "^1.7.0"
+    "jade": "^1.7.0",
+    "bluebird": "^2.3.2"
   },
   "optionalDependencies": {
     "phantom": "latest"
+  },
+  "devDependencies": {
+    "mocha": "^1.21.4",
+    "chai": "^1.9.1"
   }
 }

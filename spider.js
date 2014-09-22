@@ -2,6 +2,7 @@ var cheerio      = require('cheerio');
 var util         = require("util");
 var EventEmitter = require("events").EventEmitter;
 var winston      = require('winston');
+var Promise      = require('bluebird');
 var ee           = new EventEmitter();
 
 var log = winston.loggers.get('spider');
@@ -47,16 +48,19 @@ Spider.prototype.extract = function(descriptor, ctx){
     
     log.debug('extracting %s', selector);
 
+    var ret = null;
     switch (what) {
         case 'href':
-            return el.attr('href');
+            ret = el.attr('href');
             break;
         case 'text':
-            return el.text();
+            ret = el.text();
             break;
         default:
-            return null;
+            ret = null;
     }
+    log.debug('extracted: %s', ret);
+    return ret;
 }
 
 Spider.prototype.parse = function(html) {
@@ -77,7 +81,7 @@ Spider.prototype.parse = function(html) {
 
         var container = $(containerSelector);
         if(!container.length) {
-            log.error('Container not found: "%s"', containerSelector);
+            throw new Error('Container not found: '+ containerSelector);
             process.exit(1);
         }
 
@@ -96,6 +100,7 @@ Spider.prototype.parse = function(html) {
             log.warn('no items were scraped.');
         }
     });
+    return Promise.resolve(self.items);
 }
 
 Spider.prototype.hasNextUrl = function(){
