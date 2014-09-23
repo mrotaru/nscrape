@@ -26,9 +26,34 @@ describe('Spider', function(){
                     expect(items).to.have.length(1);
                     expect(items[0]).to.deep.equal({title: 'Foo'});
                 });
-            })
+            });
+
+            it('should throw when item property selector is not found', function(){
+                var itemT ={
+                    selector: '.article',
+                    properties: {
+                        title: '.no-such-thing'
+                    }
+                };
+                spider.addItemType(itemT);
+                expect(spider.parse.bind(spider,html)).to.throw(Error);
+            });
+
+            // mv to scrape test; not extractor
+            xit('should throw when item element selector is not found', function(){
+                var itemT ={
+                    selector: '.no-such-item-element',
+                    properties: {
+                        title: '.title'
+                    }
+                };
+                spider.addItemType(itemT);
+                expect(spider.parse.bind(spider,html)).to.throw(Error);
+            });
         }),
+
         describe('when descriptor is object', function(){
+
             it('should throw if descriptor does not have `selector` property', function(){
                 var itemT ={
                     selector: '.article',
@@ -39,6 +64,7 @@ describe('Spider', function(){
                 spider.addItemType(itemT);
                 expect(spider.parse.bind(spider,html)).to.throw('Descriptor does not have a `selector` property');
             });
+
             it('should assume `text` if no `extract` property', function(){
                 var itemT ={
                     selector: '.article',
@@ -55,7 +81,26 @@ describe('Spider', function(){
                     expect(items[0]).to.deep.equal({title: 'Foo'});
                 });
             });
-            xit('should be able to extract `href` attribute', function(){ });
+
+            it('should be able to extract `href` attribute', function(){
+                var itemT ={
+                    selector: '.article',
+                    properties: {
+                        url: {
+                            selector: '.my-url', // select an anchor...
+                            extract: 'href',     // and extract href from it
+                        }
+                    }
+                };
+                spider.addItemType(itemT);
+                html = '<body><div class="article"><a class="my-url" href="http://google.com">Google</a></div></body>';
+                spider.parse(html).then(function(items){
+                    expect(items).to.be.a('array');
+                    expect(items).to.have.length(1);
+                    expect(items[0]).to.deep.equal({url: 'http://google.com'});
+                });
+            });
+
             xit('should try to extract as an attribute if `extract` is not known', function(){ });
         })
         describe('when item proerties are optional', function(){

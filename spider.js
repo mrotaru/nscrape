@@ -42,6 +42,15 @@ Spider.prototype.extract = function(descriptor, ctx){
         selector = descriptor.selector;
     }
 
+    el = self.$(ctx).find(selector);
+    log.debug(el);
+    if(!el.length) {
+        throw new Error('Cannot find: ' + selector);
+    }
+    
+    log.debug('extracting %s', selector);
+
+    var ret = null;
     var what = '';
     if(typeof(descriptor) === 'string'){
         what = 'text';
@@ -49,15 +58,6 @@ Spider.prototype.extract = function(descriptor, ctx){
         what = 'extract' in descriptor ? descriptor.extract : 'text';
     }
 
-    el = self.$(ctx).find(selector);
-    if(!el.length) {
-        log.error('cannot find: ', selector);
-        return null;
-    }
-    
-    log.debug('extracting %s', selector);
-
-    var ret = null;
     switch (what) {
         case 'href':
             ret = el.attr('href');
@@ -91,7 +91,6 @@ Spider.prototype.parse = function(html) {
         var container = $(containerSelector);
         if(!container.length) {
             throw new Error('Container not found: '+ containerSelector);
-            process.exit(1);
         }
 
         container.find(itemType.selector).each(function(i,el){
