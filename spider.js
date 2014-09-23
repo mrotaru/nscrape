@@ -32,7 +32,16 @@ Spider.prototype.extract = function(descriptor, ctx){
     var descriptor = args.shift();
     var ctx = args.shift() || 'body';
 
-    var selector =typeof(descriptor) === 'string' ? descriptor : descriptor.selector;
+    var selector = '';
+    if(typeof(descriptor) === 'string') {
+        selector = descriptor;
+    } else {
+        if(!descriptor.selector){
+            throw new Error('Descriptor does not have a `selector` property');
+        }
+        selector = descriptor.selector;
+    }
+
     var what = '';
     if(typeof(descriptor) === 'string'){
         what = 'text';
