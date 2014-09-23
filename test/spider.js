@@ -33,13 +33,28 @@ describe('Spider', function(){
                 var itemT ={
                     selector: '.article',
                     properties: {
-                        title: {}
+                        title: {} // descriptor without `selector`
                     }
                 };
                 spider.addItemType(itemT);
                 expect(spider.parse.bind(spider,html)).to.throw('Descriptor does not have a `selector` property');
             });
-            xit('should assume `text` if no `extract` property', function(){ });
+            it('should assume `text` if no `extract` property', function(){
+                var itemT ={
+                    selector: '.article',
+                    properties: {
+                        title: {
+                            selector: '.title' // descriptor without `extract`
+                        }
+                    }
+                };
+                spider.addItemType(itemT);
+                spider.parse(html).then(function(items){
+                    expect(items).to.be.a('array');
+                    expect(items).to.have.length(1);
+                    expect(items[0]).to.deep.equal({title: 'Foo'});
+                });
+            });
             xit('should be able to extract `href` attribute', function(){ });
             xit('should try to extract as an attribute if `extract` is not known', function(){ });
         })
