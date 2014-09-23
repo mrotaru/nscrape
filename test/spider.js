@@ -101,6 +101,25 @@ describe('Spider', function(){
                 });
             });
 
+            it('should not throw and extract when item property selector is not found and property is optional', function(){
+                var itemT ={
+                    selector: '.article',
+                    properties: {
+                        title: {
+                            selector: '.no-such-thing',
+                            optional: true
+                        }
+
+                    }
+                };
+                spider.addItemType(itemT);
+                spider.parse(html).then(function(items){
+                    expect(items).to.be.a('array');
+                    expect(items).to.have.length(1);
+                    expect(items[0]).to.deep.equal({title: null});
+                });
+            });
+
             xit('should try to extract as an attribute if `extract` is not known', function(){ });
         })
         describe('when item proerties are optional', function(){

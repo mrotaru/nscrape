@@ -45,7 +45,12 @@ Spider.prototype.extract = function(descriptor, ctx){
     el = self.$(ctx).find(selector);
     log.debug(el);
     if(!el.length) {
-        throw new Error('Cannot find: ' + selector);
+        if(typeof(descriptor) === 'object' && descriptor.optional) {
+            log.debug('optional property element not found: %s setting to null', ret);
+            return null;
+        } else {
+            throw new Error('Cannot find: ' + selector);
+        }
     }
     
     log.debug('extracting %s', selector);
