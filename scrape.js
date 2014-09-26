@@ -2,6 +2,8 @@ var request = require('request');
 var fs = require('fs');
 var winston = require('winston');
 
+var Pipeline = require('./Pipeline.js');
+
 var spider_path = ('./spiders');
 
 //var proxy = "http://127.0.0.1:8888"; // will be used by Request
@@ -163,6 +165,15 @@ Scraper.prototype._requestScrape = function(url){
 
 var scraper = new Scraper(spider_name);
 
+var pipeline = new Pipeline();
+pipeline.use(function(item){
+    return log_item.info('%j',item, {});
+});
+
+scraper.spider.on("item-scraped", function(item){
+    pipeline.process(item);
+});
+
 // web interface
 var web = 0;
 var app = null;
@@ -202,7 +213,4 @@ if(process.argv[3] === '--web'){
     });
 } else {
     scraper.scrape();
-    scraper.spider.on("item-scraped", function(item){
-        log_item.info('%j',item, {});
-    });
 }
