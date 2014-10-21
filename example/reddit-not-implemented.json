@@ -1,0 +1,29 @@
+{
+    "name" = "reddit",
+    "baseUrl" = "http://www.reddit.com/r/javascript",
+    "nextUrlDescriptor" = {
+        "selector": "span.nextprev a",
+        "extract": "href"
+    },
+    "parameters" = [{
+        "category": ["javascript", "c++" ],
+    }],
+    "itemTypes" = [{
+        "name": "link",
+        "container": ".linklisting"
+        "selector": ".thing"
+        "properties": {
+            "title": ".title",
+            "votes": ".score:not(.dislikes):not(.likes)",
+            "isExternal": {
+                "optional": true,
+                "function": "if this.attr('asd') || this.someCherioFunction return this.text()"
+            }
+        },
+        "optionalProperties": [ "author" ],
+        "more": [{
+            "url": "http://www.example.com/$id",
+            "properties": {}
+        ]
+    }]
+}

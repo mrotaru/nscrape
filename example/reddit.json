@@ -1,14 +1,14 @@
 {
-    "name" = "reddit",
-    "baseUrl" = "http://www.reddit.com/r/javascript",
-    "nextUrlDescriptor" = {
+    "name": "reddit",
+    "baseUrl": "http://www.reddit.com/r/javascript",
+    "nextUrlDescriptor": {
         "selector": "span.nextprev a",
         "extract": "href"
     },
-    "itemTypes" = [{
+    "itemTypes": [{
         "name": "link",
-        "container": ".linklisting"
-        "selector": ".thing"
+        "container": ".linklisting",
+        "selector": ".thing",
         "properties": {
             "title": ".title",
             "votes": ".score:not(.dislikes):not(.likes)"
