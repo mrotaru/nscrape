@@ -11,7 +11,10 @@ function Spider(fileName){
     EventEmitter.call(this);
 
     if(fileName){
-        this.loadFromJson(fileName);
+        var j = require('./' + fileName);
+        this.name = j.name;
+        this.baseUrl = j.baseUrl;
+        this.itemTypes = j.itemTypes;
     } else {
         this.name = '';
         this.baseUrl = '';
@@ -26,13 +29,6 @@ function Spider(fileName){
 };
 
 util.inherits(Spider, EventEmitter);
-
-Spider.prototype.loadFromJson = function(fileName){
-    var j = require(fileName);
-    this.name = j.name;
-    this.baseUrl = j.baseUrl;
-    this.itemTypes = j.itemTypes;
-}
 
 Spider.prototype.addItemType = function(itemType){
     this.itemTypes.push(itemType);

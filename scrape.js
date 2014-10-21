@@ -49,7 +49,7 @@ Scraper.prototype.init = function(spider_name) {
     var self = this;
     var Spider = null;
     if(fs.existsSync('./' + spider_name)){
-        if(spider_name.indexOf('.json', spider_name.length - "json".length) !== -1) {
+        if(spider_name.indexOf('.json', spider_name.length - ".json".length) !== -1) {
             log.log('info','loading JSON spider %s', spider_name);
             Spider = require('./spider.js')(spider_name);
         } else {
