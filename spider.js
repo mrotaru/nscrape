@@ -7,12 +7,19 @@ var ee           = new EventEmitter();
 
 var log = winston.loggers.get('spider');
 
-function Spider(){
+function Spider(fileName){
     EventEmitter.call(this);
-    this.name = '';
-    this.baseUrl = '';
+
+    if(fileName){
+        this.loadFromJson(fileName);
+    } else {
+        this.name = '';
+        this.baseUrl = '';
+        this.itemTypes = [];
+    }
+
+    // runtime
     this.items = [];
-    this.itemTypes = [];
     this._html = null;
     this.$ = null;
     this.currentPage = null;
@@ -20,11 +27,22 @@ function Spider(){
 
 util.inherits(Spider, EventEmitter);
 
+Spider.prototype.loadFromJson = function(fileName){
+    var j = require(fileName);
+    this.name = j.name;
+    this.baseUrl = j.baseUrl;
+    this.itemTypes = j.itemTypes;
+}
+
 Spider.prototype.addItemType = function(itemType){
     this.itemTypes.push(itemType);
 }
 
-// 1 arg: descriptor, use self.$ as ctx
+// descriptor has the following format:
+// 1) a string - used as selector to find text in `ctx`
+// 2) an object
+//      Must have a `selector` property. Other, optional properties:
+//      - extract - one of: "text" (default) or "href"
 Spider.prototype.extract = function(descriptor, ctx){
     var self = this;
     var args = Array.prototype.slice.call(arguments);
