@@ -57,7 +57,7 @@ Spider.prototype.extract = function(descriptor, ctx){
     }
 
     el = self.$(ctx).find(selector);
-    log.debug(el);
+    //log.debug(el);
     if(!el.length) {
         if(typeof(descriptor) === 'object' && descriptor.optional) {
             log.debug('optional property element not found: %s setting to null', ret);
