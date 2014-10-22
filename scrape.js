@@ -72,7 +72,8 @@ Scraper.prototype.init = function(spider_name) {
         }
     }
     self.spider = Spider;
-    self.start_url = typeof this.spider.start_url == 'undefined' ? 'http://www.' + this.spider.name : this.spider.start_url;
+    console.log(self.spider);
+    self.start_url = typeof this.spider.baseUrl == 'undefined' ? 'http://www.' + this.spider.name : this.spider.baseUrl;
 }
 
 Scraper.prototype.scrape = function(url){
