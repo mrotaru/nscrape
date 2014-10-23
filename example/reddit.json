@@ -10,7 +10,7 @@
         "container": ".linklisting",
         "selector": ".thing",
         "properties": {
-            "title": ".title",
+            "title": "a.title",
             "votes": ".score:not(.dislikes):not(.likes)"
         }
     }]
