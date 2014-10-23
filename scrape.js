@@ -174,7 +174,7 @@ var scraper = new Scraper(spider_name);
 
 var pipeline = new Pipeline();
 pipeline.use(function(item){
-    return log_item.info('%j',item, {});
+    return log_item.info('(%d) %s',item.votes, item.title);
 });
 
 scraper.spider.on("item-scraped", function(item){
