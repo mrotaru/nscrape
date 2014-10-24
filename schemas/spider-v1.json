@@ -1,0 +1,36 @@
+{
+    "title": "Nscr Spider",
+    "type": "object",
+    "definitions": {
+        "objDescriptor": {
+            "type": "object",
+            "properties": {
+                "selector": {
+                    "type": "string"
+                },
+                "extract": {
+                    "enum": ["href", "text"]
+                }
+            },
+            "required": ["selector"]
+        },
+        "descriptor": {
+            "oneOf": [
+                { "type": "string" },
+                { "$ref": "#/definitions/objDescriptor" }
+            ]
+        }
+    },
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "baseUrl": {
+            "type": "string"
+        },
+        "nextUrlDescriptor": {
+            "$ref": "#/definitions/descriptor"
+        }
+    },
+    "required": ["name", "itemTypes"]
+}
