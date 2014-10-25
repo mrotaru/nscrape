@@ -15,6 +15,9 @@ function Spider(fileName){
         this.name = j.name;
         this.baseUrl = j.baseUrl;
         this.itemTypes = j.itemTypes;
+        if(j.nextUrlDescriptor) {
+            this.nextUrlDescriptor = j.nextUrlDescriptor;
+        }
     } else {
         this.name = '';
         this.baseUrl = '';
