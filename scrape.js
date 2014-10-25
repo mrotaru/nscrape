@@ -1,6 +1,9 @@
 var request = require('request');
 var fs = require('fs');
 var winston = require('winston');
+var ZSchema = require("z-schema");
+
+var validator = new ZSchema();
 
 var Spider = require('./spider.js');
 var Pipeline = require('./Pipeline.js');
@@ -10,7 +13,7 @@ var spider_path = ('./spiders');
 //var proxy = "http://127.0.0.1:8888"; // will be used by Request
 
 var spider_name =process.argv[2];
-var extractLinks = 1; // by default, scrape 2 pages
+var extractLinks = 2; // by default, scrape 2 pages
 
 // setup logging
 winston.loggers.add('scraper', {
@@ -51,6 +54,19 @@ Scraper.prototype.init = function(spider_name) {
     var spider = null;
     if(fs.existsSync('./' + spider_name)){
         if(spider_name.indexOf('.json', spider_name.length - ".json".length) !== -1) {
+            log.log('info','validating JSON spider: %s', spider_name);
+            var instance = require("./" + spider_name);
+            var schema = require("./schemas/spider-v1.json");
+            var valid = validator.validate(instance, schema);
+            if(!valid) {
+                log.error('Spider is not valid');
+                var errors = validator.getLastErrors();
+                for (var i=0; i < errors.length; ++i) {
+                    log.error('%d: (%s) %s', i+1, errors[i].path, errors[i].message);
+                }
+                process.exit(1);
+            }
+            log.log('info','validity: OK');
             log.log('info','loading JSON spider %s', spider_name);
             spider = new Spider(spider_name);
         } else {
