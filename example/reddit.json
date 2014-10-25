@@ -2,6 +2,7 @@
     "name": "reddit",
     "baseUrl": "http://www.reddit.com/r/javascript",
     "nextUrlDescriptor": {
+        "selector": "span.nextprev a",
         "extract": "href"
     },
     "itemTypes": [{
