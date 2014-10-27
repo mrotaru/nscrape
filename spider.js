@@ -3,6 +3,9 @@ var util         = require("util");
 var EventEmitter = require("events").EventEmitter;
 var winston      = require('winston');
 var Promise      = require('bluebird');
+var ZSchema      = require("z-schema");
+
+var validator    = new ZSchema();
 var ee           = new EventEmitter();
 
 var log = winston.loggers.get('spider');
@@ -11,6 +14,20 @@ function Spider(fileName){
     EventEmitter.call(this);
 
     if(fileName){
+        log.log('info','validating JSON spider: %s', fileName);
+        var instance = require("./" + fileName);
+        var schema = require("./schemas/spider-v1.json");
+        var valid = validator.validate(instance, schema);
+        if(!valid) {
+            log.error('Spider is not valid');
+            var errors = validator.getLastErrors();
+            for (var i=0; i < errors.length; ++i) {
+                log.error('%d: (%s) %s', i+1, errors[i].path, errors[i].message);
+            }
+            process.exit(1);
+        }
+        log.log('info','validity: OK');
+        log.log('info','loading JSON spider %s', fileName);
         var j = require('./' + fileName);
         this.name = j.name;
         this.baseUrl = j.baseUrl;
