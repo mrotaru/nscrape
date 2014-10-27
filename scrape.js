@@ -49,27 +49,28 @@ function Scraper(spider_name) {
 Scraper.prototype.init = function(spider_name) {
     var self = this;
     var spider = null;
-    if(fs.existsSync('./' + spider_name)){
-        if(spider_name.indexOf('.json', spider_name.length - ".json".length) !== -1) {
-            spider = new Spider(spider_name);
+    try {
+        if(fs.existsSync('./' + spider_name)){
+            if(spider_name.indexOf('.json', spider_name.length - ".json".length) !== -1) {
+                spider = new Spider(spider_name);
+            } else {
+                spider = require('./' + spider_name);
+            }
         } else {
-            spider = require('./' + spider_name);
-        }
-    } else {
-        // try to load spider from local dir
-        var localPath = spider_path + '/' + spider_name;
-        if(fs.existsSync(localPath)) {
-            log.log('info','loading spider %s from ', spider_name, localPath);
-            spider = require(localPath);
-        } else {
-            log.log('info','trying to load spider %s from ', spider_name, spider_name + '-spider');
-            try {
+            // try to load spider from local dir
+            var localPath = spider_path + '/' + spider_name;
+            if(fs.existsSync(localPath)) {
+                log.log('info','loading spider %s from ', spider_name, localPath);
+                spider = require(localPath);
+            } else {
+                log.log('info','trying to load spider %s from ', spider_name, spider_name + '-spider');
                 spider = require('./node_modules/' + spider_name + '-spider');
-            } catch(e){
-                log.error('could not load spider "%s": %s', spider_name, e.code);
-                process.exit(1);
             }
         }
+    } catch(e) {
+        log.error('could not load spider "%s": %s', spider_name);
+        log.error('%s', e.toString());
+        process.exit(1);
     }
     self.spider = spider;
     console.log(self.spider);
