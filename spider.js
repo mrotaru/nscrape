@@ -1,7 +1,6 @@
 var cheerio      = require('cheerio');
 var util         = require("util");
 var EventEmitter = require("events").EventEmitter;
-var winston      = require('winston');
 var Promise      = require('bluebird');
 var ZSchema      = require("z-schema");
 
@@ -15,7 +14,7 @@ function Spider(fileName){
     EventEmitter.call(this);
 
     if(fileName){
-        log.info('validating JSON spider: %s', fileName);
+        log.info('validating JSON spider:', fileName);
         var instance = require("./" + fileName);
         var schema = require("./schemas/spider-v1.json");
         var valid = validator.validate(instance, schema);
@@ -23,12 +22,12 @@ function Spider(fileName){
             log.error('Spider is not valid');
             var errors = validator.getLastErrors();
             for (var i=0; i < errors.length; ++i) {
-                log.error('%d: (%s) %s', i+1, errors[i].path, errors[i].message);
+                log.error(i+1, ': (', errors[i].path, ') ', errors[i].message);
             }
             process.exit(1);
         }
         log.info('validity: OK');
-        log.info('loading JSON spider %s', fileName);
+        log.info('loading JSON spider ', fileName);
         var j = require('./' + fileName);
         this.name = j.name;
         this.baseUrl = j.baseUrl;
@@ -88,7 +87,7 @@ Spider.prototype.extract = function(descriptor, ctx){
         }
     }
     
-    log.debug('extracting %s', selector);
+    log.debug('extracting ', selector);
 
     var ret = null;
     var what = '';
@@ -108,7 +107,7 @@ Spider.prototype.extract = function(descriptor, ctx){
         default:
             ret = null;
     }
-    log.debug('extracted: %s', ret);
+    log.debug('extracted: ', ret);
     return ret;
 }
 
