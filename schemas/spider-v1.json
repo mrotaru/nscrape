@@ -19,6 +19,22 @@
                 { "type": "string" },
                 { "$ref": "#/definitions/objDescriptor" }
             ]
+        },
+        "itemType": {
+            "type": "object",
+            "properties": {
+                "name":         { "type": "string" },
+                "container":    { "type": "string" },
+                "selector":     { "type": "string" },
+                "properties":   { 
+                    "type": "object",
+                    "patternProperties": {
+                        "^.*$": {
+                            "$ref" : "#/definitions/descriptor"
+                        }
+                    }
+                }
+            }
         }
     },
     "properties": {
@@ -30,6 +46,12 @@
         },
         "nextUrlDescriptor": {
             "$ref": "#/definitions/descriptor"
+        },
+        "itemTypes": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/itemType"
+            }
         }
     },
     "required": ["name", "itemTypes"]
