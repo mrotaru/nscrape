@@ -1,6 +1,5 @@
 var request = require('request');
 var fs = require('fs');
-var winston = require('winston');
 
 var Spider = require('./spider.js');
 var Pipeline = require('./Pipeline.js');
@@ -13,33 +12,9 @@ var spider_name =process.argv[2];
 var extractLinks = 2; // by default, scrape 2 pages
 
 // setup logging
-winston.loggers.add('scraper', {
-    console: {
-        level: 'info',
-        colorize: 'true',
-        label: 'scraper',
-    }
-});
-
-winston.loggers.add('item', {
-    console: {
-        level: 'info',
-        colorize: 'true',
-        label: 'item',
-    }
-});
-
-winston.loggers.add('spider', {
-    console: {
-        level: 'info',
-        colorize: 'true',
-        label: 'spider'
-    }
-});
-
-var log = winston.loggers.get('scraper');
-var log_item = winston.loggers.get('item');
-winston.addColors({info: 'grey'});
+var log = require('minilog')('main');
+var log_item = require('minilog')('item');
+require('minilog').enable();
 
 function Scraper(spider_name) {
     this.init(spider_name);
@@ -60,16 +35,16 @@ Scraper.prototype.init = function(spider_name) {
             // try to load spider from local dir
             var localPath = spider_path + '/' + spider_name;
             if(fs.existsSync(localPath)) {
-                log.log('info','loading spider %s from ', spider_name, localPath);
+                log.info('loading spider ' + spider_name + ' from ' + localPath);
                 spider = require(localPath);
             } else {
-                log.log('info','trying to load spider %s from ', spider_name, spider_name + '-spider');
+                log.info('trying to load spider ' + spider_name + ' from ' + localPath + '-spider');
                 spider = require('./node_modules/' + spider_name + '-spider');
             }
         }
     } catch(e) {
-        log.error('could not load spider "%s": %s', spider_name);
-        log.error('%s', e.toString());
+        log.error('could not load spider "' +  spider_name + '":');
+        log.error(e.toString());
         process.exit(1);
     }
     self.spider = spider;
@@ -79,7 +54,7 @@ Scraper.prototype.init = function(spider_name) {
 
 Scraper.prototype.scrape = function(url){
 
-    log.info('scrape called with %s',url);
+    log.info('scrape called with ',url);
 
     var self = this;
     var spider = self.spider;
@@ -107,7 +82,7 @@ Scraper.prototype.scrape = function(url){
 }
 
 Scraper.prototype._scrape = function(url){
-    log.info('_scrape called with %s',url);
+    log.info('_scrape called with ',url);
     if(this.spider.phantom) {
         this._phantomScrape(url);
     } else {
@@ -153,17 +128,17 @@ Scraper.prototype._requestScrape = function(url){
         request_options,
         function(err, resp, body) {
             if (!err && resp.statusCode == 200) {
-                log.info('got data back from %s', request_options.uri);
+                log.info('got data back from ', request_options.uri);
                 spider.parse(body);
                 if(spider.hasNextUrl()) {
                     self.scrape();
                 }
             } else {
                 if(err) {
-                    log.error('request [%s] failed: %s', request_options.uri, err.code);
+                    log.error('request ' + request_options.uri + ' failed: ' + err.code);
                 }
                 if(resp) {
-                    log.error('request [%s] failed; resp: %s', request_options.uri, resp);
+                    log.error('request ' + request_options.uri + ' failed: ' + resp);
                 }
             }
         }
@@ -174,7 +149,7 @@ var scraper = new Scraper(spider_name);
 
 var pipeline = new Pipeline();
 pipeline.use(function(item){
-    return log_item.info('(%d) %s',item.votes, item.title);
+    return log_item.info('(' + item.votes + ') ' + item.title);
 });
 
 scraper.spider.on("item-scraped", function(item){

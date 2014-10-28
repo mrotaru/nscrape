@@ -7,11 +7,11 @@
   "dependencies": {
     "request": "latest",
     "cheerio": "latest",
-    "winston": "^0.7.3",
     "express": "^4.9.4",
     "socket.io": "^1.1.0",
     "jade": "^1.7.0",
-    "bluebird": "^2.3.2"
+    "bluebird": "^2.3.2",
+    "minilog": "^2.0.6"
   },
   "optionalDependencies": {
     "phantom": "latest"

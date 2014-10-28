@@ -8,13 +8,14 @@ var ZSchema      = require("z-schema");
 var validator    = new ZSchema();
 var ee           = new EventEmitter();
 
-var log = winston.loggers.get('spider');
+var log = require('minilog')('spider');
+require('minilog').enable();
 
 function Spider(fileName){
     EventEmitter.call(this);
 
     if(fileName){
-        log.log('info','validating JSON spider: %s', fileName);
+        log.info('validating JSON spider: %s', fileName);
         var instance = require("./" + fileName);
         var schema = require("./schemas/spider-v1.json");
         var valid = validator.validate(instance, schema);
@@ -26,8 +27,8 @@ function Spider(fileName){
             }
             process.exit(1);
         }
-        log.log('info','validity: OK');
-        log.log('info','loading JSON spider %s', fileName);
+        log.info('validity: OK');
+        log.info('loading JSON spider %s', fileName);
         var j = require('./' + fileName);
         this.name = j.name;
         this.baseUrl = j.baseUrl;
