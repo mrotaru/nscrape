@@ -87,7 +87,7 @@ Spider.prototype.extract = function(descriptor, ctx){
         }
     }
     
-    log.debug('extracting ', selector);
+    log.debug('selector: ', selector);
 
     var ret = null;
     var what = '';

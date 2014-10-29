@@ -180,10 +180,6 @@ if(process.argv[3] === '--web'){
     });
 
     io.on('connection', function (socket) {
-        socket.on('my other event', function (data) {
-            console.log(data);
-        });
-
         socket.on('start', function(socket){
             console.log('start from web interface');
             scraper.scrape();
