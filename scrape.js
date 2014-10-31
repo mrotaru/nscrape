@@ -157,10 +157,8 @@ scraper.spider.on("item-scraped", function(item){
 });
 
 // web interface
-var web = 0;
-var app = null;
 if(process.argv[3] === '--web'){
-    web = 1;
+    require('./web/app.js')(scraper);
 } else {
     scraper.scrape();
 }
