@@ -1,5 +1,7 @@
 var request = require('request');
 var fs = require('fs');
+var nconf = require('nconf');
+var program = require('commander');
 
 var Spider = require('./spider.js');
 var Pipeline = require('./Pipeline.js');
@@ -8,13 +10,25 @@ var spider_path = ('./spiders');
 
 //var proxy = "http://127.0.0.1:8888"; // will be used by Request
 
+program
+  .version('0.0.1')
+  .option('-w, --web', 'Start the web interface')
+  .option('-v, --verbose', 'Verbose output')
+  .option('-d, --debug', 'Print debug info', 'false')
+  .parse(process.argv);
+
 var spider_name =process.argv[2];
+nconf.argv()
+     .file({file: 'config.json'});
+
 var extractLinks = 2; // by default, scrape 2 pages
 
 // setup logging
-var log = require('minilog')('main');
-var log_item = require('minilog')('item');
-require('minilog').enable();
+var Minilog = require('minilog');
+var log = Minilog('main');
+var log_item = Minilog('item');
+Minilog.enable();
+Minilog.suggest.deny(/spider/, 'debug');
 
 function Scraper(spider_name) {
     this.init(spider_name);
@@ -48,7 +62,6 @@ Scraper.prototype.init = function(spider_name) {
         process.exit(1);
     }
     self.spider = spider;
-    console.log(self.spider);
     self.start_url = typeof this.spider.baseUrl == 'undefined' ? 'http://www.' + this.spider.name : this.spider.baseUrl;
 }
 
