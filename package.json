@@ -8,9 +8,9 @@
     "bluebird": "^2.3.2",
     "cheerio": "latest",
     "commander": "^2.5.0",
+    "debug": "^2.1.0",
     "express": "^4.9.4",
     "jade": "^1.7.0",
-    "minilog": "^2.0.6",
     "nconf": "^0.6.9",
     "request": "latest",
     "socket.io": "^1.1.0"

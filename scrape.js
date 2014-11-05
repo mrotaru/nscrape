@@ -18,17 +18,19 @@ program
   .parse(process.argv);
 
 var spider_name =process.argv[2];
+
 nconf.argv()
      .file({file: 'config.json'});
 
-var extractLinks = 2; // by default, scrape 2 pages
-
 // setup logging
-var Minilog = require('minilog');
-var log = Minilog('main');
-var log_item = Minilog('item');
-Minilog.enable();
-Minilog.suggest.deny(/spider/, 'debug');
+var debug = require('debug');
+var log = debug('main');
+var log_item = debug('item');
+var error = debug('main:error');
+var info = debug('main:info');
+error.log = console.error.bind(console);
+
+var extractLinks = 2; // by default, scrape 2 pages
 
 function Scraper(spider_name) {
     this.init(spider_name);
@@ -49,16 +51,16 @@ Scraper.prototype.init = function(spider_name) {
             // try to load spider from local dir
             var localPath = spider_path + '/' + spider_name;
             if(fs.existsSync(localPath)) {
-                log.info('loading spider ' + spider_name + ' from ' + localPath);
+                info('loading spider ' + spider_name + ' from ' + localPath);
                 spider = require(localPath);
             } else {
-                log.info('trying to load spider ' + spider_name + ' from ' + localPath + '-spider');
+                info('trying to load spider ' + spider_name + ' from ' + localPath + '-spider');
                 spider = require('./node_modules/' + spider_name + '-spider');
             }
         }
     } catch(e) {
-        log.error('could not load spider "' +  spider_name + '":');
-        log.error(e.toString());
+        log('could not load spider "' +  spider_name + '":');
+        log(e.toString());
         process.exit(1);
     }
     self.spider = spider;
@@ -67,13 +69,13 @@ Scraper.prototype.init = function(spider_name) {
 
 Scraper.prototype.scrape = function(url){
 
-    log.info('scrape called with ',url);
+    info('scrape called with ',url);
 
     var self = this;
     var spider = self.spider;
 
     var hasNextUrl = spider.hasNextUrl();
-    log.info('has nextUrl: ', hasNextUrl);
+    info('has nextUrl: ', hasNextUrl);
     var needMoreUrls = self._scrapedLinks < extractLinks ? true: false;
     var haveUrlArg = typeof(url) != 'undefined' ? true: false;
 
@@ -95,7 +97,7 @@ Scraper.prototype.scrape = function(url){
 }
 
 Scraper.prototype._scrape = function(url){
-    log.info('_scrape called with ',url);
+    info('_scrape called with ',url);
     if(this.spider.phantom) {
         this._phantomScrape(url);
     } else {
@@ -141,17 +143,17 @@ Scraper.prototype._requestScrape = function(url){
         request_options,
         function(err, resp, body) {
             if (!err && resp.statusCode == 200) {
-                log.info('got data back from ', request_options.uri);
+                info('got data back from ', request_options.uri);
                 spider.parse(body);
                 if(spider.hasNextUrl()) {
                     self.scrape();
                 }
             } else {
                 if(err) {
-                    log.error('request ' + request_options.uri + ' failed: ' + err.code);
+                    error('request ' + request_options.uri + ' failed: ' + err.code);
                 }
                 if(resp) {
-                    log.error('request ' + request_options.uri + ' failed: ' + resp);
+                    error('request ' + request_options.uri + ' failed: ' + resp);
                 }
             }
         }
@@ -162,7 +164,7 @@ var scraper = new Scraper(spider_name);
 
 var pipeline = new Pipeline();
 pipeline.use(function(item){
-    return log_item.info('(' + item.votes + ') ' + item.title);
+    return log_item('(' + item.votes + ') ' + item.title);
 });
 
 scraper.spider.on("item-scraped", function(item){

@@ -7,27 +7,29 @@ var ZSchema      = require("z-schema");
 var validator    = new ZSchema();
 var ee           = new EventEmitter();
 
-var log = require('minilog')('spider');
-require('minilog').enable();
+var debug = require('debug');
+var log = debug('spider');
+var error = debug('spider:error');
+error.log = console.error.bind(console);
 
 function Spider(fileName){
     EventEmitter.call(this);
 
     if(fileName){
-        log.info('validating JSON spider:', fileName);
+        log('validating JSON spider:', fileName);
         var instance = require("./" + fileName);
         var schema = require("./schemas/spider-v1.json");
         var valid = validator.validate(instance, schema);
         if(!valid) {
-            log.error('Spider is not valid');
+            error('Spider is not valid');
             var errors = validator.getLastErrors();
             for (var i=0; i < errors.length; ++i) {
-                log.error(i+1, ': (', errors[i].path, ') ', errors[i].message);
+                error(i+1, ': (', errors[i].path, ') ', errors[i].message);
             }
             process.exit(1);
         }
-        log.info('validity: OK');
-        log.info('loading JSON spider ', fileName);
+        log('validity: OK');
+        log('loading JSON spider ', fileName);
         var j = require('./' + fileName);
         this.name = j.name;
         this.baseUrl = j.baseUrl;
@@ -112,7 +114,7 @@ Spider.prototype.extract = function(descriptor, ctx){
 }
 
 Spider.prototype.parse = function(html) {
-    log.info('parsing %d bytes', html.length);
+    log('parsing %d bytes', html.length);
 
     var self = this;
     self._html = html;
@@ -120,11 +122,11 @@ Spider.prototype.parse = function(html) {
 
     self.itemTypes.forEach(function(itemType){
 
-        log.info('extracting \'%s\' items', itemType.name);
+        log('extracting \'%s\' items', itemType.name);
 
         var containerSelector = itemType.container || 'body';
-        log.info('container: ', containerSelector);
-        log.info('selector: ', itemType.selector);
+        log('container: ', containerSelector);
+        log('selector: ', itemType.selector);
         var itemsScraped = 0;
 
         var container = $(containerSelector);
@@ -157,18 +159,18 @@ Spider.prototype.hasNextUrl = function(){
 // Get the url to the next page
 Spider.prototype.getNextUrl = function() {
     var self = this;
-    log.info('getting nextUrl');
+    log('getting nextUrl');
     if(self.nextUrl) return self.nextUrl();
     if(self.currentPage === null) {
         self.currentPage = 1;
-        log.info('setting currentPate to 1');
+        log('setting currentPate to 1');
         return self.baseUrl;
     } else {
-        log.info('currentPage: %s', self.currentPage);
+        log('currentPage: %s', self.currentPage);
         self.currentPage = self.currentPage+1;
         if(self.hasOwnProperty('nextUrlDescriptor')){
             var ret = self.extract(self.nextUrlDescriptor);
-            log.info('nextUrl: ', ret);
+            log('nextUrl: ', ret);
             return ret;
         } else {
             return null;
