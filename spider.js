@@ -90,7 +90,7 @@ Spider.prototype.extract = function(descriptor, ctx){
         }
     }
     
-    debug('selector: ', selector);
+    debug('selector: %s', selector);
 
     var ret = null;
     var what = '';
@@ -110,7 +110,7 @@ Spider.prototype.extract = function(descriptor, ctx){
         default:
             ret = null;
     }
-    debug('extracted: ', ret);
+    debug('extracted: %s', ret);
     return ret;
 }
 
@@ -126,8 +126,8 @@ Spider.prototype.parse = function(html) {
         log('extracting \'%s\' items', itemType.name);
 
         var containerSelector = itemType.container || 'body';
-        log('container: ', containerSelector);
-        log('selector: ', itemType.selector);
+        log('container: %s', containerSelector);
+        log('selector: %s', itemType.selector);
         var itemsScraped = 0;
 
         var container = $(containerSelector);
