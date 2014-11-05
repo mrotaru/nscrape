@@ -7,9 +7,10 @@ var ZSchema      = require("z-schema");
 var validator    = new ZSchema();
 var ee           = new EventEmitter();
 
-var debug = require('debug');
-var log = debug('spider');
-var error = debug('spider:error');
+var _debug = require('debug');
+var log = _debug('spider');
+var error = _debug('spider:error');
+var debug = _debug('spider:debug');
 error.log = console.error.bind(console);
 
 function Spider(fileName){
@@ -79,17 +80,17 @@ Spider.prototype.extract = function(descriptor, ctx){
     }
 
     el = self.$(ctx).find(selector);
-    //log.debug(el);
+    //debug(el);
     if(!el.length) {
         if(typeof(descriptor) === 'object' && descriptor.optional) {
-            log.debug('optional property element not found: %s setting to null', ret);
+            debug('optional property element not found: %s setting to null', ret);
             return null;
         } else {
             throw new Error('Cannot find: ' + selector);
         }
     }
     
-    log.debug('selector: ', selector);
+    debug('selector: ', selector);
 
     var ret = null;
     var what = '';
@@ -109,7 +110,7 @@ Spider.prototype.extract = function(descriptor, ctx){
         default:
             ret = null;
     }
-    log.debug('extracted: ', ret);
+    debug('extracted: ', ret);
     return ret;
 }
 
