@@ -90,7 +90,7 @@ Spider.prototype.extract = function(descriptor, ctx){
         }
     }
     
-    debug('selector: %s', selector);
+//    debug('selector: %s', selector);
 
     var ret = null;
     var what = '';
@@ -110,7 +110,7 @@ Spider.prototype.extract = function(descriptor, ctx){
         default:
             ret = null;
     }
-    debug('extracted: %s', ret);
+//    debug('extracted: %s', ret);
     return ret;
 }
 
