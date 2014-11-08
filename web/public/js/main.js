@@ -2,7 +2,7 @@ var socket = io.connect('http://localhost');
 $(document).ready(function() {
     $('#start').click(function(){
         console.log('starting');
-        socket.emit('start', { my: 'data'});
+        //socket.emit('start', { my: 'data'});
         return false;
     });
 });
