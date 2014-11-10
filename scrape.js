@@ -33,8 +33,9 @@ error.log = console.error.bind(console);
 var extractLinks = 2; // by default, scrape 2 pages
 
 function Scraper(spider_name) {
-    this.init(spider_name);
     this._scrapedLinks = 0;
+    this.spiders = [];
+    this.init(spider_name);
 }
 
 Scraper.prototype.init = function(spider_name) {
@@ -64,6 +65,7 @@ Scraper.prototype.init = function(spider_name) {
         process.exit(1);
     }
     self.spider = spider;
+    self.spiders.push(spider);
     self.start_url = typeof this.spider.baseUrl == 'undefined' ? 'http://www.' + this.spider.name : this.spider.baseUrl;
 }
 

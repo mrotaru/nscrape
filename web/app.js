@@ -10,7 +10,8 @@ function start(scraper) {
     app.use(express.static(__dirname + '/public'));
 
     app.get('/', function (req, res) {
-        res.render('index');
+        console.log(scraper.spiders);
+        res.render('index', {spiders: scraper.spiders});
     })
 
     scraper.spider.on("item-scraped", function(item){

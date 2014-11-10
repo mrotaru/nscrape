@@ -31,7 +31,8 @@ html(lang='en')
         // /.nav-collapse
     .container
         h1 NScr Web Interface
-        button#start Start
+        for spider in spiders
+            button#start(data-spider-name=spider.name) Start
         ul#items
 
   script(src='https://cdn.socket.io/socket.io-1.1.0.js')
