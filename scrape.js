@@ -15,6 +15,7 @@ program
   .option('-w, --web', 'Start the web interface')
   .option('-v, --verbose', 'Verbose output')
   .option('-d, --debug', 'Print debug info', 'false')
+  .option('-p, --proxy', 'Use a proxy', 'false')
   .parse(process.argv);
 
 var spider_name =process.argv[2];
@@ -42,23 +43,9 @@ Scraper.prototype.init = function(spider_name) {
     var self = this;
     var spider = null;
     try {
-        if(fs.existsSync('./' + spider_name)){
-            if(spider_name.indexOf('.json', spider_name.length - ".json".length) !== -1) {
-                spider = new Spider(spider_name);
-            } else {
-                spider = require('./' + spider_name);
-            }
-        } else {
-            // try to load spider from local dir
-            var localPath = spider_path + '/' + spider_name;
-            if(fs.existsSync(localPath)) {
-                info('loading spider ' + spider_name + ' from ' + localPath);
-                spider = require(localPath);
-            } else {
-                info('trying to load spider ' + spider_name + ' from ' + localPath + '-spider');
-                spider = require('./node_modules/' + spider_name + '-spider');
-            }
-        }
+        // spiders are node modules.
+        // Look for folders matching 'nscr-[a-z\-\d]*' and try to load each
+        // Allow option to filder which spiders to load
     } catch(e) {
         log('could not load spider "' +  spider_name + '":');
         log(e.toString());
