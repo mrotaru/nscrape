@@ -18,7 +18,11 @@ function Spider(fileName){
 
     if(fileName){
         log('validating JSON spider:', fileName);
-        var instance = require("./" + fileName);
+        try {
+            var instance = require(fileName);
+        } catch(e) {
+            throw new Error('Require failed: \n' + e);
+        }
         var schema = require("./schemas/spider-v1.json");
         var valid = validator.validate(instance, schema);
         if(!valid) {
@@ -31,7 +35,7 @@ function Spider(fileName){
         }
         log('validity: OK');
         log('loading JSON spider ', fileName);
-        var j = require('./' + fileName);
+        var j = require(fileName);
         this.name = j.name;
         this.baseUrl = j.baseUrl;
         this.itemTypes = j.itemTypes;

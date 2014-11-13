@@ -2,6 +2,8 @@ var request = require('request');
 var fs = require('fs');
 var nconf = require('nconf');
 var program = require('commander');
+var path = require('path');
+var _ = require('lodash');
 
 var Spider = require('./spider.js');
 var Pipeline = require('./Pipeline.js');
@@ -33,27 +35,36 @@ error.log = console.error.bind(console);
 
 var extractLinks = 2; // by default, scrape 2 pages
 
-function Scraper(spider_name) {
+function Scraper() {
     this._scrapedLinks = 0;
     this.spiders = [];
-    this.init(spider_name);
+    this.init();
 }
 
-Scraper.prototype.init = function(spider_name) {
+Scraper.prototype.init = function() {
     var self = this;
     var spider = null;
-    try {
-        // spiders are node modules.
-        // Look for folders matching 'nscr-[a-z\-\d]*' and try to load each
-        // Allow option to filder which spiders to load
-    } catch(e) {
-        log('could not load spider "' +  spider_name + '":');
-        log(e.toString());
-        process.exit(1);
-    }
-    self.spider = spider;
-    self.spiders.push(spider);
-    self.start_url = typeof this.spider.baseUrl == 'undefined' ? 'http://www.' + this.spider.name : this.spider.baseUrl;
+        
+    var nscRegex = /^nsc-[a-z1-9\-]+$/
+    _.each(fs.readdirSync('./node_modules/').filter(function(file){
+        try {
+            return file.match(nscRegex) && fs.statSync('./node_modules/' + file).isDirectory();
+        } catch(e) {
+            return false;
+        }
+    }),function(spider){
+        try {
+            var s = new Spider(path.basename(path.join('./node_module',spider)));
+            self.spiders.push(s);
+        } catch(e) {
+            log('could not load spider "' +  spider + '":');
+            log(e);
+        }
+    });
+    console.log(self.spiders);
+//    self.spider = spider;
+//    self.spiders.push(spider);
+//    self.start_url = typeof this.spider.baseUrl == 'undefined' ? 'http://www.' + this.spider.name : this.spider.baseUrl;
 }
 
 Scraper.prototype.scrape = function(url){
