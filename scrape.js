@@ -1,3 +1,4 @@
+process.env.DEBUG='*';
 var request = require('request');
 var fs = require('fs');
 var nconf = require('nconf');
@@ -33,6 +34,8 @@ var error = debug('main:error');
 var info = debug('main:info');
 error.log = console.error.bind(console);
 
+debug.enable('item');
+
 var extractLinks = 2; // by default, scrape 2 pages
 
 function Scraper() {
@@ -61,8 +64,8 @@ Scraper.prototype.init = function() {
             log(e);
         }
     });
-    console.log(self.spiders);
-//    self.spider = spider;
+//    console.log(self.spiders);
+    self.spider = self.spiders[0];
 //    self.spiders.push(spider);
 //    self.start_url = typeof this.spider.baseUrl == 'undefined' ? 'http://www.' + this.spider.name : this.spider.baseUrl;
 }
@@ -160,16 +163,18 @@ Scraper.prototype._requestScrape = function(url){
     )
 }
 
-var scraper = new Scraper(spider_name);
+var scraper = new Scraper();
 
 var pipeline = new Pipeline();
 pipeline.use(function(item){
     return log_item('(' + item.votes + ') ' + item.title);
 });
 
-scraper.spider.on("item-scraped", function(item){
-    pipeline.process(item);
-});
+_.each(scraper.spiders, function(spider){
+    spider.on("item-scraped", function(item){
+        pipeline.process(item);
+    });
+})
 
 // web interface
 if(process.argv[3] === '--web'){
