@@ -13,6 +13,8 @@ var spider_path = ('./spiders');
 
 //var proxy = "http://127.0.0.1:8888"; // will be used by Request
 
+_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+
 program
   .version('0.0.1')
   .option('-w, --web', 'Start the web interface')
@@ -167,11 +169,23 @@ var scraper = new Scraper();
 
 var pipeline = new Pipeline();
 pipeline.use(function(item){
-    return log_item('(' + item.votes + ') ' + item.title);
+//    console.log(item);
+    if(item.__type.template) {
+//        console.log(item.__type.template);
+//        console.log(item);
+        return log_item(_.template(item.__type.template,item));
+    } else {
+        return log_item(item.title);
+    }
 });
 
 _.each(scraper.spiders, function(spider){
-    spider.on("item-scraped", function(item){
+    spider.on("item-scraped", function(item,itemTypeName){
+        _.each(spider.itemTypes, function(itemType){
+            if(itemTypeName === itemType.name){
+                item.__type = itemType;
+            }
+        });
         pipeline.process(item);
     });
 })

@@ -146,7 +146,7 @@ Spider.prototype.parse = function(html) {
             }
 
             self.items.push(item);
-            self.emit("item-scraped",item);
+            self.emit("item-scraped",item,itemType.name);
             itemsScraped++;
         })
 
