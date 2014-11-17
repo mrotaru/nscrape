@@ -4,8 +4,9 @@ var EventEmitter = require("events").EventEmitter;
 var Promise      = require('bluebird');
 var ZSchema      = require("z-schema");
 
-var validator    = new ZSchema();
-var ee           = new EventEmitter();
+var validator       = require("validator");
+var schemaValidator = new ZSchema();
+var ee              = new EventEmitter();
 
 var _debug = require('debug');
 var log = _debug('spider');
@@ -24,10 +25,10 @@ function Spider(fileName){
             throw new Error('Require failed: \n' + e);
         }
         var schema = require("./schemas/spider-v1.json");
-        var valid = validator.validate(instance, schema);
+        var valid = schemaValidator.validate(instance, schema);
         if(!valid) {
             error('Spider is not valid');
-            var errors = validator.getLastErrors();
+            var errors = schemaValidator.getLastErrors();
             for (var i=0; i < errors.length; ++i) {
                 error(i+1, ': (', errors[i].path, ') ', errors[i].message);
             }
@@ -90,7 +91,7 @@ Spider.prototype.extract = function(descriptor, ctx){
             debug('optional property element not found: %s setting to null', ret);
             return null;
         } else {
-            throw new Error('Cannot find: ' + selector);
+            throw new Error('Cannot find: ' + selector + ' in: ' + self.$(ctx));
         }
     }
     
@@ -115,6 +116,22 @@ Spider.prototype.extract = function(descriptor, ctx){
             ret = null;
     }
 //    debug('extracted: %s', ret);
+
+    // sanitizers
+    if(self.sanitizers) {
+        if(typeof self.sanitizers === 'array') {
+            _.reduce(self.sanitizers,function(result,sanitizer){
+                if(validator.hasOwnProperty(sanitizer)) {
+                    return validator[sanitizer](result);
+                } else {
+                    return result;
+                }
+            }, ret);
+        } else {
+            throw('sanitizers must be array');
+        }
+    }
+
     return ret;
 }
 
