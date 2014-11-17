@@ -5,6 +5,8 @@ var Promise      = require('bluebird');
 var ZSchema      = require("z-schema");
 
 var validator       = require("validator");
+var beautify        = require("js-beautify");
+
 var schemaValidator = new ZSchema();
 var ee              = new EventEmitter();
 
@@ -91,7 +93,7 @@ Spider.prototype.extract = function(descriptor, ctx){
             debug('optional property element not found: %s setting to null', ret);
             return null;
         } else {
-            throw new Error('Cannot find: ' + selector + ' in: ' + self.$(ctx));
+            throw new Error('Cannot find: ' + selector + ' in: ' + beautify(self.$(ctx).html(),{preserve_newlines: false}));
         }
     }
     
@@ -140,7 +142,11 @@ Spider.prototype.parse = function(html) {
 
     var self = this;
     self._html = html;
-    var $ = self.$ = cheerio.load(html);
+    var $ = self.$ = cheerio.load(html,{
+        normalizeWhitespace: false,
+        xmlMode: false,
+        decodeEntities: true
+    });
 
     self.itemTypes.forEach(function(itemType){
 

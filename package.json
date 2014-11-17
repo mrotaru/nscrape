@@ -11,6 +11,7 @@
     "debug": "^2.1.0",
     "express": "^4.9.4",
     "jade": "^1.7.0",
+    "js-beautify": "^1.5.4",
     "lodash": "^2.4.1",
     "nconf": "^0.6.9",
     "request": "latest",
