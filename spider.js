@@ -162,7 +162,15 @@ Spider.prototype.parse = function(html) {
             throw new Error('Container not found: '+ containerSelector);
         }
 
-        container.find(itemType.selector).each(function(i,el){
+        var itemsDom = container.find(itemType.selector);
+        if(itemType.exclude) {
+            $(itemsDom).filter(function(index){
+                console.log('checking ' + $(this) + ' against: ' + itemType.exclude);
+                return $(this).is(itemType.exclude);
+            });
+        }
+
+        itemsDom.each(function(i,el){
             var item = {};
             for (var prop in itemType.properties) {
                 item[prop] = self.extract(itemType.properties[prop], el);
