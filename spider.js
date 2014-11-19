@@ -181,7 +181,11 @@ Spider.prototype.parse = function(html) {
         itemsDom.each(function(i,el){
             var item = {};
             for (var prop in itemType.properties) {
-                item[prop] = self.extract(itemType.properties[prop], el);
+                try {
+                    item[prop] = self.extract(itemType.properties[prop], el);
+                } catch(e) {
+                    log("failed to extract: ",e);
+                }
             }
 
             self.items.push(item);
