@@ -162,14 +162,22 @@ Spider.prototype.parse = function(html) {
             throw new Error('Container not found: '+ containerSelector);
         }
 
+        // exclude
+        var excluded = 0;
         var itemsDom = container.find(itemType.selector);
         if(itemType.exclude) {
-            $(itemsDom).filter(function(index){
-                console.log('checking ' + $(this) + ' against: ' + itemType.exclude);
-                return $(this).is(itemType.exclude);
+            itemsDom = $(itemsDom).filter(function(index){
+                var shouldExclude = $(this).is(itemType.exclude);
+                if(shouldExclude) {
+                    log('excluding: ' + $(this).text().replace(/\s+/g, ' '));
+                    ++excluded;
+                    return false;
+                }
+                return true;
             });
         }
 
+        // extract and emit event with item
         itemsDom.each(function(i,el){
             var item = {};
             for (var prop in itemType.properties) {
@@ -182,7 +190,7 @@ Spider.prototype.parse = function(html) {
         })
 
         if(!itemsScraped) {
-            log.warn('no items were scraped.');
+            log('no items were scraped.');
         }
     });
     return Promise.resolve(self.items);
