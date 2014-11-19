@@ -2,15 +2,16 @@ var Spider = require('../spider.js');
 var expect = require('chai').expect
 
 describe('Spider', function(){
+
+    var spider;
+    var html;
+
+    beforeEach(function(){
+        spider = new Spider();
+        html = '<body><div class="article"><h1 class="title">Foo</h1></div></body>';
+    });
+
     describe('.extract', function(){
-
-        var spider;
-        var html;
-
-        beforeEach(function(){
-            spider = new Spider();
-            html = '<body><div class="article"><h1 class="title">Foo</h1></div></body>';
-        });
 
         describe('when descriptor is string', function(){
             it('should interpret descriptor as selector and extract text', function(){
@@ -126,5 +127,20 @@ describe('Spider', function(){
             xit('should throw if property not marked as optional cannot be scraped', function(){ });
             xit('should set optional propertes not found to null', function(){ });
         })
-    })
+    });
+    describe('.parse', function(){
+        it('should be able to exclude elements matching `exclude` property', function(){
+            var itemT ={
+                selector: '.article',
+                exclude: '.do-not-select',
+                properties: {}
+            };
+            spider.addItemType(itemT);
+            html = '<body><div class="article"></div><div class="article do-not-select"></div>';
+            spider.parse(html).then(function(items){
+                expect(items).to.be.a('array');
+                expect(items).to.have.length(1);
+            });
+        });
+    });
 })
