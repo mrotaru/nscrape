@@ -29,7 +29,7 @@ describe('Spider', function(){
                 });
             });
 
-            it('should throw when item property selector is not found', function(){
+            it('should skip when item property selector is not found', function(){
                 var itemT ={
                     selector: '.article',
                     properties: {
@@ -37,7 +37,10 @@ describe('Spider', function(){
                     }
                 };
                 spider.addItemType(itemT);
-                expect(spider.parse.bind(spider,html)).to.throw(Error);
+                spider.parse(html).then(function(items){
+                    expect(items).to.be.a('array');
+                    expect(items).to.have.length(0);
+                })
             });
 
             // mv to scrape test; not extractor
@@ -140,6 +143,18 @@ describe('Spider', function(){
             spider.parse(html).then(function(items){
                 expect(items).to.be.a('array');
                 expect(items).to.have.length(1);
+            });
+        });
+        it('should use `sanitize` property', function(){
+            var itemT = { selector: '.article', properties: { title: ".title" },
+                sanitizers: ["trim"]
+            };
+            spider.addItemType(itemT);
+            html = '<body><div class="article"><h2 class="title">\t Foo\n </h2></div>';
+            spider.parse(html).then(function(items){
+                expect(items).to.be.a('array');
+                expect(items).to.have.length(1);
+                expect(items[0]).to.deep.equal({title: 'Foo'});
             });
         });
     });

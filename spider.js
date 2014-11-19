@@ -122,6 +122,7 @@ Spider.prototype.extract = function(descriptor, ctx){
     // sanitizers
     if(self.sanitizers) {
         if(typeof self.sanitizers === 'array') {
+            console.log('have s');
             _.reduce(self.sanitizers,function(result,sanitizer){
                 if(validator.hasOwnProperty(sanitizer)) {
                     return validator[sanitizer](result);
@@ -181,16 +182,21 @@ Spider.prototype.parse = function(html) {
         itemsDom.each(function(i,el){
             var item = {};
             for (var prop in itemType.properties) {
+
+                if(typeof itemType.properties[prop] === 'object' && !itemType.properties[prop].selector) {
+                    console.log('have no selector');
+                    throw new Error('Descriptor does not have a `selector` property');
+                }
+
                 try {
                     item[prop] = self.extract(itemType.properties[prop], el);
+                    self.items.push(item);
+                    self.emit("item-scraped",item,itemType.name);
+                    itemsScraped++;
                 } catch(e) {
                     log("failed to extract: ",e);
                 }
             }
-
-            self.items.push(item);
-            self.emit("item-scraped",item,itemType.name);
-            itemsScraped++;
         })
 
         if(!itemsScraped) {
