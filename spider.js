@@ -10,6 +10,7 @@ var beautify        = require("js-beautify");
 var schemaValidator = new ZSchema();
 var ee              = new EventEmitter();
 
+var _      = require('lodash');
 var _debug = require('debug');
 var log = _debug('spider');
 var error = _debug('spider:error');
@@ -121,15 +122,18 @@ Spider.prototype.extract = function(descriptor, ctx){
 
     // sanitizers
     if(self.sanitizers) {
-        if(typeof self.sanitizers === 'array') {
-            console.log('have s');
-            _.reduce(self.sanitizers,function(result,sanitizer){
-                if(validator.hasOwnProperty(sanitizer)) {
-                    return validator[sanitizer](result);
+        if(typeof self.sanitizers === 'object' && Array.isArray(self.sanitizers)) {
+            _.each(self.sanitizers, function(sanitizer){
+                console.log('sanitizer - ',sanitizer);
+                if(typeof validator[sanitizer] === 'function') {
+                    console.log('AFTEEEEEEEEER SAN: ',res);
+                    var v = validator[sanitizer];
+                    console.log(v);
+                    ret = validator[sanitizer](res);
                 } else {
-                    return result;
+                    console.log('Cannot find sanitizer: ',sanitizer);
                 }
-            }, ret);
+            })
         } else {
             throw('sanitizers must be array');
         }
