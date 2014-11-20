@@ -190,13 +190,13 @@ Spider.prototype.parse = function(html) {
 
                 try {
                     item[prop] = self.extract(itemType.properties[prop], el);
-                    self.items.push(item);
-                    self.emit("item-scraped",item,itemType.name);
-                    itemsScraped++;
                 } catch(e) {
                     log("failed to extract: ",e);
                 }
             }
+            self.items.push(item);
+            self.emit("item-scraped",item,itemType.name);
+            itemsScraped++;
         })
 
         if(!itemsScraped) {
