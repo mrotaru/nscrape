@@ -43,6 +43,7 @@ function Spider(fileName){
         this.name = j.name;
         this.baseUrl = j.baseUrl;
         this.itemTypes = j.itemTypes;
+        if(j.sanitizers) this.sanitizers = j.sanitizers;
         if(j.nextUrlDescriptor) {
             this.nextUrlDescriptor = j.nextUrlDescriptor;
         }
@@ -124,12 +125,9 @@ Spider.prototype.extract = function(descriptor, ctx){
     if(self.sanitizers) {
         if(typeof self.sanitizers === 'object' && Array.isArray(self.sanitizers)) {
             _.each(self.sanitizers, function(sanitizer){
-                console.log('sanitizer - ',sanitizer);
                 if(typeof validator[sanitizer] === 'function') {
-                    console.log('AFTEEEEEEEEER SAN: ',res);
-                    var v = validator[sanitizer];
-                    console.log(v);
-                    ret = validator[sanitizer](res);
+                    ret = validator[sanitizer](ret);
+                    // console.log('after sanitizer "' + sanitizer + '": ',ret);
                 } else {
                     console.log('Cannot find sanitizer: ',sanitizer);
                 }
@@ -137,6 +135,7 @@ Spider.prototype.extract = function(descriptor, ctx){
         } else {
             throw('sanitizers must be array');
         }
+    } else {
     }
 
     return ret;
@@ -188,7 +187,6 @@ Spider.prototype.parse = function(html) {
             for (var prop in itemType.properties) {
 
                 if(typeof itemType.properties[prop] === 'object' && !itemType.properties[prop].selector) {
-                    console.log('have no selector');
                     throw new Error('Descriptor does not have a `selector` property');
                 }
 
