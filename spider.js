@@ -193,6 +193,7 @@ Spider.prototype.parse = function(html) {
                 try {
                     item[prop] = self.extract(itemType.properties[prop], el);
                 } catch(e) {
+                    throw new Error('Failed to extract: ' + e.toString());
                     log("failed to extract: ",e);
                 }
             }
