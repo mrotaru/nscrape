@@ -66,6 +66,10 @@ Spider.prototype.addItemType = function(itemType){
     this.itemTypes.push(itemType);
 }
 
+Spider.prototype.setItemType = function(itemType){
+    this.itemTypes = [itemType];
+}
+
 // descriptor has the following format:
 // 1) a string - used as selector to find text in `ctx`
 // 2) an object
@@ -184,6 +188,7 @@ Spider.prototype.parse = function(html) {
         // extract and emit event with item
         itemsDom.each(function(i,el){
             var item = {};
+            var failedToExtractProperty = false;
             for (var prop in itemType.properties) {
 
                 if(typeof itemType.properties[prop] === 'object' && !itemType.properties[prop].selector) {
@@ -193,13 +198,17 @@ Spider.prototype.parse = function(html) {
                 try {
                     item[prop] = self.extract(itemType.properties[prop], el);
                 } catch(e) {
-                    throw new Error('Failed to extract: ' + e.toString());
+                    //throw new Error('Failed to extract: ' + e.toString());
                     log("failed to extract: ",e);
+                    failedToExtractProperty = true;
+                    break;
                 }
             }
-            self.items.push(item);
-            self.emit("item-scraped",item,itemType.name);
-            itemsScraped++;
+            if(!failedToExtractProperty) {
+                self.items.push(item);
+                self.emit("item-scraped",item,itemType.name);
+                itemsScraped++;
+            }
         })
 
         if(!itemsScraped) {

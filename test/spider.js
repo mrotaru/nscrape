@@ -21,7 +21,7 @@ describe('Spider', function(){
                         title: '.title'
                     }
                 };
-                spider.addItemType(itemT);
+                spider.setItemType(itemT);
                 spider.parse(html).then(function(items){
                     expect(items).to.be.a('array');
                     expect(items).to.have.length(1);
@@ -36,7 +36,7 @@ describe('Spider', function(){
                         title: '.no-such-thing'
                     }
                 };
-                spider.addItemType(itemT);
+                spider.setItemType(itemT);
                 spider.parse(html).then(function(items){
                     expect(items).to.be.a('array');
                     expect(items).to.have.length(0);
@@ -51,7 +51,7 @@ describe('Spider', function(){
                         title: '.title'
                     }
                 };
-                spider.addItemType(itemT);
+                spider.setItemType(itemT);
                 expect(spider.parse.bind(spider,html)).to.throw(Error);
             });
         }),
@@ -65,7 +65,7 @@ describe('Spider', function(){
                         title: {} // descriptor without `selector`
                     }
                 };
-                spider.addItemType(itemT);
+                spider.setItemType(itemT);
                 expect(spider.parse.bind(spider,html)).to.throw('Descriptor does not have a `selector` property');
             });
 
@@ -78,7 +78,7 @@ describe('Spider', function(){
                         }
                     }
                 };
-                spider.addItemType(itemT);
+                spider.setItemType(itemT);
                 spider.parse(html).then(function(items){
                     expect(items).to.be.a('array');
                     expect(items).to.have.length(1);
@@ -96,7 +96,7 @@ describe('Spider', function(){
                         }
                     }
                 };
-                spider.addItemType(itemT);
+                spider.setItemType(itemT);
                 html = '<body><div class="article"><a class="my-url" href="http://google.com">Google</a></div></body>';
                 spider.parse(html).then(function(items){
                     expect(items).to.be.a('array');
@@ -116,7 +116,7 @@ describe('Spider', function(){
 
                     }
                 };
-                spider.addItemType(itemT);
+                spider.setItemType(itemT);
                 spider.parse(html).then(function(items){
                     expect(items).to.be.a('array');
                     expect(items).to.have.length(1);
@@ -138,7 +138,7 @@ describe('Spider', function(){
                 exclude: '.do-not-select',
                 properties: {}
             };
-            spider.addItemType(itemT);
+            spider.setItemType(itemT);
             html = '<body><div class="article"></div><div class="article do-not-select"></div>';
             spider.parse(html).then(function(items){
                 expect(items).to.be.a('array');
@@ -147,7 +147,7 @@ describe('Spider', function(){
         });
         it('should use `sanitize` property', function(){
             var itemT = { selector: '.article', properties: { title: ".title" }};
-            spider.addItemType(itemT);
+            spider.setItemType(itemT);
             spider.sanitizers = ["trim"];
             html = '<body><div class="article"><h2 class="title">\t Foo\n </h2></div>';
             spider.parse(html).then(function(items){
