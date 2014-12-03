@@ -1,5 +1,6 @@
 process.env.DEBUG='*';
-var request = require('request');
+var Promise = require('bluebird');
+var request = Promise.promisifyAll(require('request'));
 var fs = require('fs');
 var nconf = require('nconf');
 var program = require('commander');
@@ -21,6 +22,7 @@ program
   .option('-v, --verbose', 'Verbose output')
   .option('-d, --debug', 'Print debug info', 'false')
   .option('-p, --proxy', 'Use a proxy', 'false')
+  .option('-w, --wait <ms>', 'Wait between requests', 2000)
   .parse(process.argv);
 
 var spider_name =process.argv[2];
@@ -72,6 +74,11 @@ Scraper.prototype.init = function() {
 //    self.start_url = typeof this.spider.baseUrl == 'undefined' ? 'http://www.' + this.spider.name : this.spider.baseUrl;
 }
 
+/**
+ * Scrapes - either the given `url`, or current spider's `nextUrl`
+ *
+ * @param {string} url which URL to scrape
+ */
 Scraper.prototype.scrape = function(url){
 
     info('scrape called with ',url);
@@ -88,25 +95,21 @@ Scraper.prototype.scrape = function(url){
 
     if(haveUrlArg) {
         self._scrape(url);
-        done = true;
     } else if(!haveUrlArg && hasNextUrl && needMoreUrls ) {
         var nextUrl = spider.getNextUrl();
         self._scrape(nextUrl, self.scrape);
     } else if(!haveUrlArg && !hasNextUrl) {
         var url = self.start_url;
         self._scrape(self.spider.baseUrl);
-        done = true;
-    } else {
-        done = true;
     }
 }
 
 Scraper.prototype._scrape = function(url){
     info('_scrape called with ',url);
     if(this.spider.phantom) {
-        this._phantomScrape(url);
+        return this._phantomScrape(url);
     } else {
-        this._requestScrape(url);
+        return this._requestScrape(url);
     }
 }
 
@@ -144,25 +147,27 @@ Scraper.prototype._requestScrape = function(url){
     request_options.uri = url;
     request_options.proxy = typeof proxy != 'undefined' ? proxy : null;
 
-    request(
-        request_options,
-        function(err, resp, body) {
-            if (!err && resp.statusCode == 200) {
-                info('got data back from ', request_options.uri);
-                spider.parse(body);
-                if(spider.hasNextUrl()) {
+    return request.getAsync(request_options).spread(function(resp,body){
+        if(resp.statusCode == 200) {
+            info('got data back from ', request_options.uri);
+            spider.parse(body);
+            if(spider.hasNextUrl()) {
+                if(program.wait) {
+                    info('waiting...' + program.wait);
+                    return Promise.delay(self,program.wait).then(function(){
+                        self.scrape();
+                    })
+                } else {
                     self.scrape();
                 }
-            } else {
-                if(err) {
-                    error('request ' + request_options.uri + ' failed: ' + err.code);
-                }
-                if(resp) {
-                    error('request ' + request_options.uri + ' failed: ' + resp);
-                }
             }
+        } else {
+            error('request ' + request_options.uri + ' failed - code is: ' + resp.statusCode);
         }
-    )
+    }).catch(function(err) {
+        error('request ' + request_options.uri + ' failed: ');
+        error(err);
+    });
 }
 
 var scraper = new Scraper();
