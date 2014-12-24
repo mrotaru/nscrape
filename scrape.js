@@ -23,6 +23,7 @@ program
   .option('-d, --debug', 'Print debug info', 'false')
   .option('-p, --proxy', 'Use a proxy', 'false')
   .option('-w, --wait <ms>', 'Wait between requests', 2000)
+  .option('-s, --spider <name>', 'Which spider to run')
   .parse(process.argv);
 
 var spider_name =process.argv[2];
@@ -48,6 +49,16 @@ function Scraper() {
     this.init();
 }
 
+Scraper.prototype.getSpider = function(name){
+    for (var i = 0; i < this.spiders.length; ++i){
+        log('comparing ', this.spiders[i].name, 'with', name)
+        if (this.spiders[i].name === name) {
+            return this.spiders[i];
+        }
+    }
+    return null;
+}
+
 Scraper.prototype.init = function() {
     var self = this;
     var spider = null;
@@ -68,10 +79,12 @@ Scraper.prototype.init = function() {
             log(e);
         }
     });
-//    console.log(self.spiders);
-    self.spider = self.spiders[0];
-//    self.spiders.push(spider);
-//    self.start_url = typeof this.spider.baseUrl == 'undefined' ? 'http://www.' + this.spider.name : this.spider.baseUrl;
+    log(program.spider);
+    self.spider = self.getSpider(program.spider);
+    if(!self.spider){
+        error.log("No such spider: " + program.spider);
+        process.exit(1);
+    }
 }
 
 /**
