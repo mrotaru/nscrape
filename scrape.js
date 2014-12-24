@@ -51,7 +51,6 @@ function Scraper() {
 
 Scraper.prototype.getSpider = function(name){
     for (var i = 0; i < this.spiders.length; ++i){
-        log('comparing ', this.spiders[i].name, 'with', name)
         if (this.spiders[i].name === name) {
             return this.spiders[i];
         }
@@ -82,7 +81,7 @@ Scraper.prototype.init = function() {
     log(program.spider);
     self.spider = self.getSpider(program.spider);
     if(!self.spider){
-        error.log("No such spider: " + program.spider);
+        error("No such spider: " + program.spider);
         process.exit(1);
     }
 }
