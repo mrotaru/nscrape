@@ -62,22 +62,14 @@ Scraper.prototype.init = function() {
     var self = this;
     var spider = null;
         
-    var nscRegex = /^nsc-[a-z1-9\-]+$/
-    _.each(fs.readdirSync('./node_modules/').filter(function(file){
-        try {
-            return file.match(nscRegex) && fs.statSync('./node_modules/' + file).isDirectory();
-        } catch(e) {
-            return false;
-        }
-    }),function(spider){
-        try {
-            var s = new Spider(path.basename(path.join('./node_module',spider)));
-            self.spiders.push(s);
-        } catch(e) {
-            log('could not load spider "' +  spider + '":');
-            log(e);
-        }
-    });
+    var spiderFolder = 'nsc-' + program.spider;
+    try {
+        var s = new Spider(spiderFolder);
+        self.spiders.push(s);
+    } catch (e) {
+        log('could not load spider "' + spiderFolder + '":');
+        log(e);
+    }
     log(program.spider);
     self.spider = self.getSpider(program.spider);
     if(!self.spider){
