@@ -18,7 +18,7 @@ _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 program
   .version('0.0.1')
-  .option('-w, --web', 'Start the web interface')
+  .option('--web', 'Start the web interface', 'false')
   .option('-v, --verbose', 'Verbose output')
   .option('-d, --debug', 'Print debug info', 'false')
   .option('-p, --proxy', 'Use a proxy', 'false')
@@ -200,7 +200,7 @@ _.each(scraper.spiders, function(spider){
 })
 
 // web interface
-if(process.argv[3] === '--web'){
+if(program.web){
     require('./web/app.js')(scraper);
 } else {
     scraper.scrape();
