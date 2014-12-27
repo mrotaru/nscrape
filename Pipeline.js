@@ -1,6 +1,7 @@
 var util         = require("util");
 var Promise      = require("bluebird");
 var EventEmitter = require("events").EventEmitter;
+var _            = require("lodash");
 
 function Pipeline() {
     EventEmitter.call(this);
@@ -10,10 +11,23 @@ function Pipeline() {
 
 util.inherits(Pipeline, EventEmitter);
 
+var log_item = require('debug')('item');
+function consoleFilter(item){
+    if (item.__type.template) {
+        log_item(_.template(item.__type.template,item));
+    } else {
+        log_item(item.title);
+    }
+    return item;
+};
+
 Pipeline.prototype.use = function(filter){
     var self = this;
+    console.log('Using filter: ' + filter)
     if(typeof(filter) === 'function'){
         self.filters.push(filter);
+    } else if (filter === 'console') {
+        self.filters.push(consoleFilter);
     } else {
         self.load(filter);
     }

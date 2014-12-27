@@ -21,7 +21,8 @@ program
   .option('--web', 'Start the web interface', 'false')
   .option('-v, --verbose', 'Verbose output')
   .option('-d, --debug', 'Print debug info', 'false')
-  .option('-p, --proxy', 'Use a proxy', 'false')
+  .option('--proxy', 'Use a proxy', 'false')
+  .option('-f, --filters <names>', 'Filters to use', 'console')
   .option('-w, --wait <ms>', 'Wait between requests', 2000)
   .option('-s, --spider <name>', 'Which spider to run')
   .parse(process.argv);
@@ -34,7 +35,6 @@ nconf.argv()
 // setup logging
 var debug = require('debug');
 var log = debug('main');
-var log_item = debug('item');
 var error = debug('main:error');
 var info = debug('main:info');
 error.log = console.error.bind(console);
@@ -176,18 +176,18 @@ Scraper.prototype._requestScrape = function(url){
 
 var scraper = new Scraper();
 
+// create a pipeline - load all filters
 var pipeline = new Pipeline();
-pipeline.use(function(item){
-//    console.log(item);
-    if(item.__type.template) {
-//        console.log(item.__type.template);
-//        console.log(item);
-        return log_item(_.template(item.__type.template,item));
-    } else {
-        return log_item(item.title);
+_.each(program.filters.split(','), function (filter) {
+    try {
+        pipeline.use(filter)
+    } catch (ex) {
+        error('Could not load filter ' + filter + ': ' + ex)
     }
 });
 
+// set event listener on each spider - set __type and process
+// it with the pipeline
 _.each(scraper.spiders, function(spider){
     spider.on("item-scraped", function(item,itemTypeName){
         _.each(spider.itemTypes, function(itemType){
