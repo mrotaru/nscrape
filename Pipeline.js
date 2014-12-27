@@ -47,6 +47,7 @@ Pipeline.prototype.process = function(item){
 
 // load a filter from a file
 Pipeline.prototype.load = function(filter){
+    throw new Error('Not implemented.')
 }
 
 module.exports = Pipeline;

@@ -186,6 +186,11 @@ _.each(program.filters.split(','), function (filter) {
     }
 });
 
+if (pipeline.filters.length === 0 && !program.web) {
+    error('No filters - exiting.')
+    process.exit(1);
+}
+
 // set event listener on each spider - set __type and process
 // it with the pipeline
 _.each(scraper.spiders, function(spider){
