@@ -157,10 +157,10 @@ Scraper.prototype._requestScrape = function(url){
             spider.parse(body);
             if(spider.hasNextUrl()) {
                 if(program.wait) {
-                    info('waiting...' + program.wait);
                     return Promise.delay(self,program.wait).then(function(){
                         self.scrape();
                     })
+                    info('waiting...' + program.wait);
                 } else {
                     self.scrape();
                 }
@@ -186,21 +186,38 @@ _.each(program.filters.split(','), function (filter) {
     }
 });
 
+var awsDynamoDBFilter = require("./filters/aws.dynamo");
+awsDynamoDBFilter.config({
+    region: 'eu-west-1',
+    params: {
+        TableName: 'scraped-items'
+    }
+})
+
+pipeline.use(awsDynamoDBFilter);
+
+// in cli mode, at least one filter should be loaded
 if (pipeline.filters.length === 0 && !program.web) {
     error('No filters - exiting.')
     process.exit(1);
 }
 
-// set event listener on each spider - set __type and process
+// set event listener on each spider - set __template and process
 // it with the pipeline
 _.each(scraper.spiders, function(spider){
     spider.on("item-scraped", function(item,itemTypeName){
         _.each(spider.itemTypes, function(itemType){
             if(itemTypeName === itemType.name){
-                item.__type = itemType;
+                if (itemType.template) {
+                    item.__template = itemType.template;
+                }
             }
         });
-        pipeline.process(item);
+        try {
+            pipeline.process(item);
+        } catch (e) {
+            error('Pipeline could not process: ',e)
+        }
     });
 })
 

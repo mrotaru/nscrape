@@ -13,8 +13,8 @@ util.inherits(Pipeline, EventEmitter);
 
 var log_item = require('debug')('item');
 function consoleFilter(item){
-    if (item.__type.template) {
-        log_item(_.template(item.__type.template,item));
+    if (item.__template) {
+        log_item(_.template(item.__template,item));
     } else {
         log_item(item.title);
     }
@@ -26,6 +26,8 @@ Pipeline.prototype.use = function(filter){
     console.log('Using filter: ' + filter)
     if(typeof(filter) === 'function'){
         self.filters.push(filter);
+    } else if (typeof(filter) === 'object' && filter.filter && typeof filter.filter === 'function') {
+        self.filters.push(filter.filter);
     } else if (filter === 'console') {
         self.filters.push(consoleFilter);
     } else {
