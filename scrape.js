@@ -186,16 +186,6 @@ _.each(program.filters.split(','), function (filter) {
     }
 });
 
-var awsDynamoDBFilter = require("./filters/aws.dynamo");
-awsDynamoDBFilter.config({
-    region: 'eu-west-1',
-    params: {
-        TableName: 'scraped-items'
-    }
-})
-
-pipeline.use(awsDynamoDBFilter);
-
 // in cli mode, at least one filter should be loaded
 if (pipeline.filters.length === 0 && !program.web) {
     error('No filters - exiting.')
