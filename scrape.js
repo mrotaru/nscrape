@@ -12,8 +12,6 @@ var Pipeline = require('./Pipeline.js');
 
 var spider_path = ('./spiders');
 
-//var proxy = "http://127.0.0.1:8888"; // will be used by Request
-
 _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 program
@@ -21,7 +19,7 @@ program
   .option('--web', 'Start the web interface', 'false')
   .option('-v, --verbose', 'Verbose output')
   .option('-d, --debug', 'Print debug info', 'false')
-  .option('--proxy', 'Use a proxy', 'false')
+  .option('--proxy', 'Use a proxy', 'false') // "http://127.0.0.1:8888" for Request
   .option('-f, --filters <names>', 'Filters to use', 'console')
   .option('-w, --wait <ms>', 'Wait between requests', 2000)
   .option('-s, --spider <name>', 'Which spider to run')
@@ -49,6 +47,7 @@ function Scraper() {
     this.init();
 }
 
+// return spider with `name`
 Scraper.prototype.getSpider = function(name){
     for (var i = 0; i < this.spiders.length; ++i){
         if (this.spiders[i].name === name) {
