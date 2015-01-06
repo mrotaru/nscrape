@@ -85,8 +85,9 @@ Spider.prototype.extract = function(descriptor, ctx){
     var selector = '';
     if(typeof(descriptor) === 'string') {
         selector = descriptor;
-    } else {
-        if(!descriptor.selector){
+    } else if(descriptor.hasOwnProperty('function')){
+        // parse function and run in the context of `ctx`
+    } else if(!descriptor.selector){
             throw new Error('Descriptor does not have a `selector` property');
         }
         selector = descriptor.selector;
