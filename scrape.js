@@ -61,12 +61,11 @@ Scraper.prototype.init = function() {
     var self = this;
     var spider = null;
         
-    var spiderFolder = 'nsc-' + program.spider;
     try {
-        var s = new Spider(spiderFolder);
+        var s = new Spider(program.spider);
         self.spiders.push(s);
     } catch (e) {
-        log('could not load spider "' + spiderFolder + '":');
+        log('could not load spider "' + program.spider + '":');
         log(e);
     }
     log(program.spider);

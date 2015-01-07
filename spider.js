@@ -21,6 +21,13 @@ function Spider(fileName){
     EventEmitter.call(this);
 
     if(fileName){
+
+//        var suffix = '.json';
+//        if(fileName.indexOf(suffix, fileName.length - suffix.length) !== -1){
+//        } else if(fileName.indexOf('nsc-') === 0){
+//            fileName = fileName.substring(4);
+//        }
+
         log('validating JSON spider:', fileName);
         try {
             var instance = require(fileName);
@@ -85,11 +92,14 @@ Spider.prototype.extract = function(descriptor, ctx){
     var selector = '';
     if(typeof(descriptor) === 'string') {
         selector = descriptor;
-    } else if(descriptor.hasOwnProperty('function')){
+    } else if(descriptor.hasOwnProperty('sfunction')){
         // parse function and run in the context of `ctx`
+        var f = new Function(descriptor.sfunction).bind(ctx);
+        var res = f();
+        return res;
     } else if(!descriptor.selector){
-            throw new Error('Descriptor does not have a `selector` property');
-        }
+        throw new Error('Descriptor does not have a `selector` property');
+    } else {
         selector = descriptor.selector;
     }
 
