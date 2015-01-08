@@ -50,7 +50,11 @@ function Scraper() {
 // return spider with `name`
 Scraper.prototype.getSpider = function(name){
     for (var i = 0; i < this.spiders.length; ++i){
-        if (this.spiders[i].name === name) {
+        var sname = this.spiders[i].name;
+        if(sname.indexOf('nsc-') === 0){
+            sname = sname.substring(4);
+        }
+        if (sname === name) {
             return this.spiders[i];
         }
     }
