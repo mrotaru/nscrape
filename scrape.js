@@ -51,13 +51,15 @@ function Scraper() {
 Scraper.prototype.getSpider = function(name){
     for (var i = 0; i < this.spiders.length; ++i){
         var sname = this.spiders[i].name;
-        if(sname.indexOf('nsc-') === 0){
-            sname = sname.substring(4);
+        if(name.indexOf('nsc-') === 0){
+            name = name.substring(4);
         }
+        console.log(name);
         if (sname === name) {
             return this.spiders[i];
         }
     }
+    return this.spiders[0];
     return null;
 }
 

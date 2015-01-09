@@ -3,19 +3,31 @@
     "type": "object",
     "definitions": {
         "objDescriptor": {
-            "type": "object",
-            "properties": {
-                "selector": {
-                    "type": "string"
+            "oneOf": [
+                {
+                "type": "object",
+                "properties": {
+                    "selector": {
+                        "type": "string"
+                    },
+                    "extract": {
+                        "enum": ["href", "text"]
+                    },
+                    "sfunction": {
+                        "type": "string"
+                    }
                 },
-                "extract": {
-                    "enum": ["href", "text"]
+                "required": ["selector"]
+            },{
+                "type": "object",
+                "properties": {
+                    "sfunction": {
+                        "type": "string"
+                    }
                 },
-                "function": {
-                    "type": "string"
-                }
-            },
-            "required": ["selector"]
+                "required": ["sfunction"]
+            }
+            ]
         },
         "descriptor": {
             "oneOf": [
