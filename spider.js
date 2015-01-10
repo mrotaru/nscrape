@@ -94,8 +94,8 @@ Spider.prototype.extract = function(descriptor, ctx){
         selector = descriptor;
     } else if(descriptor.hasOwnProperty('sfunction')){
         // parse function and run in the context of `ctx`
-        var f = new Function(descriptor.sfunction).bind(ctx);
-        var res = f();
+        var f = new Function('var $ = arguments[0]; ' + descriptor.sfunction).bind(ctx);
+        var res = f.call(self.$);
         return res;
     } else if(!descriptor.selector){
         throw new Error('Descriptor does not have a `selector` property');
@@ -202,7 +202,9 @@ Spider.prototype.parse = function(html) {
             var failedToExtractProperty = false;
             for (var prop in itemType.properties) {
 
-                if(typeof itemType.properties[prop] === 'object' && !itemType.properties[prop].selector) {
+                var isFunc = itemType.properties[prop].hasOwnProperty('sfunction');
+
+                if(!isFunc && typeof itemType.properties[prop] === 'object' && !itemType.properties[prop].selector) {
                     throw new Error('Descriptor does not have a `selector` property');
                 }
 
