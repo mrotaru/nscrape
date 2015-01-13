@@ -4,6 +4,7 @@
   "description": "Web scraper",
   "main": "server.js",
   "author": "mrotaru",
+  "bin": "./scrape.js",
   "dependencies": {
     "bluebird": "^2.3.2",
     "cheerio": "latest",
