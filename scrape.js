@@ -15,7 +15,7 @@ var spider_path = ('./spiders');
 _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 program
-  .version('0.0.1')
+  .version('0.0.2')
   .option('--web', 'Start the web interface', 'false')
   .option('-v, --verbose', 'Verbose output')
   .option('-d, --debug', 'Print debug info', 'false')
