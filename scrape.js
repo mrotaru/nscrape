@@ -23,6 +23,7 @@ program
   .option('-f, --filters <names>', 'Filters to use', 'console')
   .option('-w, --wait <ms>', 'Wait between requests', 2000)
   .option('-s, --spider <name>', 'Which spider to run')
+  .option('-p, --pages <number>', 'How many pages to scrape', 2)
   .parse(process.argv);
 
 var spider_name =process.argv[2];
@@ -39,7 +40,7 @@ error.log = console.error.bind(console);
 
 debug.enable('item');
 
-var extractLinks = 2; // by default, scrape 2 pages
+var extractLinks = program.pages; // by default, scrape 2 pages
 
 function Scraper() {
     this._scrapedLinks = 0;
