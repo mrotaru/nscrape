@@ -1,0 +1,20 @@
+{
+    "name": "test",
+    "baseUrl": "http://www.reddit.com/r/javascript",
+    "nextUrlDescriptor": {
+        "selector": "span.nextprev a",
+        "extract": "href"
+    },
+    "itemTypes": [{
+        "name": "link",
+        "container": ".linklisting",
+        "selector": ".thing",
+        "properties": {
+            "title": "a.title",
+            "votes": {
+                "sfunction": "return $(this).text();"
+            }
+        },
+        "template": "{{ votes }} {{ title }}"
+    }]
+}
