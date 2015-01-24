@@ -9,5 +9,5 @@ $(document).ready(function() {
 
 socket.on('item-scraped', function(item){
     console.log('item: ',item);
-    $('#items').append($('<li>').text(item.title));
+    $('#items').prepend($('<li>').text(item.title));
 });
