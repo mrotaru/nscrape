@@ -55,7 +55,6 @@ Scraper.prototype.getSpider = function(name){
         if(name.indexOf('nsc-') === 0){
             name = name.substring(4);
         }
-        console.log(name);
         if (sname === name) {
             return this.spiders[i];
         }
@@ -201,13 +200,6 @@ if (pipeline.filters.length === 0 && !program.web) {
 // it with the pipeline
 _.each(scraper.spiders, function(spider){
     spider.on("item-scraped", function(item,itemTypeName){
-        _.each(spider.itemTypes, function(itemType){
-            if(itemTypeName === itemType.name){
-                if (itemType.template) {
-                    item.__template = itemType.template;
-                }
-            }
-        });
         try {
             pipeline.process(item);
         } catch (e) {

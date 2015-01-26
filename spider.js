@@ -199,6 +199,11 @@ Spider.prototype.parse = function(html) {
         itemsDom.each(function(i,el){
             var item = {};
             var failedToExtractProperty = false;
+
+            if (itemType.template) {
+                item.__template = itemType.template;
+            }
+
             for (var prop in itemType.properties) {
 
                 var isFunc = itemType.properties[prop].hasOwnProperty('sfunction');
