@@ -48,7 +48,7 @@ function processLine(line){
     } else {
         answers[pq.id] = line;
         rl.removeListener('line', processLine);
-        fs.writeFileSync('spider.json',compiledTemplate(answers));
+        fs.writeFileSync(answers.name + '-spider.json',compiledTemplate(answers));
         process.exit(0);
     }
 }
