@@ -7,8 +7,6 @@ var _ = require('lodash');
 var readline = require('readline');
 var rl = readline.createInterface(process.stdin, process.stdout);
 
-var spider_path = ('./spiders');
-
 var questions = [
     {id: 'name', text: 'Spider name: ', type: 'string'},
     {id: 'baseUrl', text: 'Base URL: ', type: 'string'},
@@ -23,7 +21,7 @@ var compiledTemplate = null;
 _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 try {
-    template = fs.readFileSync('spider.template');
+    template = fs.readFileSync('tools/spider.template');
     compiledTemplate = _.template(template);
 } catch(err) {
     console.log(err);
@@ -48,8 +46,15 @@ function processLine(line){
     } else {
         answers[pq.id] = line;
         rl.removeListener('line', processLine);
-        fs.writeFileSync(answers.name + '-spider.json',compiledTemplate(answers));
-        process.exit(0);
+        var outName = answers.name + '-spider.json';
+        try {
+            fs.writeFileSync(outName,compiledTemplate(answers));
+            console.log('writing: ' + outName);
+            process.exit(0);
+        } catch(e){
+            console.log('Error',e);
+            process.exit(1);
+        }
     }
 }
 
