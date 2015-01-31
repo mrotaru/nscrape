@@ -18,7 +18,9 @@ var questions = [
 
 var compiledTemplate = null;
 
-_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+_.templateSettings.evaluate=/\{\{(.+?)\}\}/g;
+_.templateSettings.interpolate=/\{\{=(.+?)\}\}/g;
+_.templateSettings.escape=/\{\{-(.+?)\}\}/g;
 
 try {
     template = fs.readFileSync('tools/spider.template');

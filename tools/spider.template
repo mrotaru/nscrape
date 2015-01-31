@@ -1,17 +1,17 @@
 {
-    "name": "{{ name }}",
-    "baseUrl": "{{ baseUrl }}",
+    "name": "{{= name }}",
+    "baseUrl": "{{= baseUrl }}",
     "nextUrlDescriptor": {
-        "selector": "{{ nextUrlDescriptorSelector }}",
+        "selector": "{{= nextUrlDescriptorSelector }}",
         "extract": "href"
     },
     "itemTypes": [{
-        "name": "{{ itemTypeName }}",
-        "container": "{{ itemTypeContainerSelector }}",
-        "selector": "{{ itemTypeSelector }}",
+        "name": "{{= itemTypeName }}",
+        "container": "{{= itemTypeContainerSelector }}",
+        "selector": "{{= itemTypeSelector }}",
         "properties": {
             "title": "a.title",
         },
-        "template": "\{\{ title \}\}"
+        "template": "{{ title }}"
     }]
 }
