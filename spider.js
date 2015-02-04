@@ -54,6 +54,7 @@ function Spider(fileName){
         if(j.nextUrlDescriptor) {
             this.nextUrlDescriptor = j.nextUrlDescriptor;
         }
+        this.cookies = j.cookies ? true : false;
     } else {
         this.name = '';
         this.baseUrl = '';

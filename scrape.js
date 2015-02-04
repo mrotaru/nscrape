@@ -150,7 +150,9 @@ Scraper.prototype._phantomScrape = function(url){
 Scraper.prototype._requestScrape = function(url){
 
     var self = this;
-    var request_options = {};
+    var request_options = {
+        jar: self.spider.hasOwnProperty('cookies') && self.spider.cookies === true ? true : false
+    };
     var spider = self.spider;
     request_options.uri = url;
     request_options.proxy = typeof proxy != 'undefined' ? proxy : null;
