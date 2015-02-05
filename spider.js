@@ -110,7 +110,11 @@ Spider.prototype.extract = function(descriptor, ctx){
             debug('optional property element not found: %s setting to null', ret);
             return null;
         } else {
-            throw new Error('Cannot find: ' + selector + ' in: ' + beautify(self.$(ctx).html(),{preserve_newlines: false}));
+            throw new Error('Cannot find: ' + selector + ' in: ' + beautify(
+                    self.$(ctx).html(),{
+                    preserve_newlines: false
+                })
+           );
         }
     }
     
@@ -178,7 +182,11 @@ Spider.prototype.parse = function(html) {
 
         var container = $(containerSelector);
         if(!container.length) {
-            throw new Error('Container not found: '+ containerSelector);
+            throw new Error('Container not found: ' + containerSelector+ ' in: ' + beautify(
+                    self.$('body').html(),{
+                    preserve_newlines: false
+                })
+           );
         }
 
         // exclude
