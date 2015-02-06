@@ -5,7 +5,7 @@ var Promise      = require('bluebird');
 var ZSchema      = require("z-schema");
 
 var validator       = require("validator");
-var beautify        = require("js-beautify");
+var beautify        = require("js-beautify").html;
 
 var schemaValidator = new ZSchema();
 var ee              = new EventEmitter();
@@ -111,9 +111,8 @@ Spider.prototype.extract = function(descriptor, ctx){
             return null;
         } else {
             throw new Error('Cannot find: ' + selector + ' in: ' + beautify(
-                    self.$(ctx).html(),{
-                    preserve_newlines: false
-                })
+                    self.$(ctx).html(), beuatify_options
+                )
            );
         }
     }
@@ -171,6 +170,12 @@ Spider.prototype.parse = function(html) {
         decodeEntities: true
     });
 
+    var beautify_options = {
+        preserve_newlines: false,
+        indent_size: 2,
+        wrap_line_length: 80
+    };
+
     self.itemTypes.forEach(function(itemType){
 
         log('extracting \'%s\' items', itemType.name);
@@ -183,9 +188,8 @@ Spider.prototype.parse = function(html) {
         var container = $(containerSelector);
         if(!container.length) {
             throw new Error('Container not found: ' + containerSelector+ ' in: ' + beautify(
-                    self.$('body').html(),{
-                    preserve_newlines: false
-                })
+                    self.$('body').html(), beautify_options
+                )
            );
         }
 
