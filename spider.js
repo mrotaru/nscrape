@@ -78,6 +78,25 @@ Spider.prototype.setItemType = function(itemType){
     this.itemTypes = [itemType];
 }
 
+// rel: http://stackoverflow.com/a/17891099/447661
+// rel: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error#Example.3A_Custom_Error_Types
+function ExtractorError(message,html) {
+    this.name = 'ExtractorError';
+    this.message = message + '\n' + html.substring(0,800);
+    if(html.length > 800) {
+        var fs = require('fs');
+        fs.writeFileSync('debug.html', html);
+    }
+}
+ExtractorError.prototype = Object.create(Error.prototype);
+ExtractorError.prototype.constructor = ExtractorError;
+
+var beautify_options = {
+    preserve_newlines: false,
+    indent_size: 2,
+    wrap_line_length: 80
+};
+
 // descriptor has the following format:
 // 1) a string - used as selector to find text in `ctx`
 // 2) an object
@@ -110,10 +129,8 @@ Spider.prototype.extract = function(descriptor, ctx){
             debug('optional property element not found: %s setting to null', ret);
             return null;
         } else {
-            throw new Error('Cannot find: ' + selector + ' in: ' + beautify(
-                    self.$(ctx).html(), beuatify_options
-                )
-           );
+            var bhtml = beautify(self.$(ctx).html(), beautify_options)                                                   
+            throw new ExtractorError('Cannot find: ' + selector, bhtml );
         }
     }
     
@@ -170,12 +187,6 @@ Spider.prototype.parse = function(html) {
         decodeEntities: true
     });
 
-    var beautify_options = {
-        preserve_newlines: false,
-        indent_size: 2,
-        wrap_line_length: 80
-    };
-
     self.itemTypes.forEach(function(itemType){
 
         log('extracting \'%s\' items', itemType.name);
@@ -187,10 +198,8 @@ Spider.prototype.parse = function(html) {
 
         var container = $(containerSelector);
         if(!container.length) {
-            throw new Error('Container not found: ' + containerSelector+ ' in: ' + beautify(
-                    self.$('body').html(), beautify_options
-                )
-           );
+            var bhtml = beautify(self.$.html(), beautify_options)                                                   
+            throw new ExtractorError('Container not found: ' + containerSelector, bhtml );
         }
 
         // exclude

@@ -19,6 +19,7 @@ program
   .option('--web', 'Start the web interface', 'false')
   .option('-v, --verbose', 'Verbose output')
   .option('-d, --debug', 'Print debug info', 'false')
+  .option('--html-debug-file', 'Store html causing errors in files', 'false')
   .option('--proxy', 'Use a proxy', 'false') // "http://127.0.0.1:8888" for Request
   .option('-f, --filters <names>', 'Filters to use', 'console')
   .option('-w, --wait <ms>', 'Wait between requests', 2000)
