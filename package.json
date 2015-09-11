@@ -5,7 +5,7 @@
   "main": "server.js",
   "author": "mrotaru",
   "bin": {
-    "nsc": "./scrape.js",
+    "nsc": "./scrape.js"
   },
   "dependencies": {
     "bluebird": "^2.3.2",
