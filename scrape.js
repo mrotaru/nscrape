@@ -22,7 +22,7 @@ program
   .option('--html-debug-file', 'Store html causing errors in files', 'false')
   .option('--proxy', 'Use a proxy', 'false') // "http://127.0.0.1:8888" for Request
   .option('-f, --filters <names>', 'Filters to use', 'console')
-  .option('-w, --wait <ms>', 'Wait between requests', 2000)
+  .option('-w, --wait <ms>', 'Wait between requests', 500)
   .option('-s, --spider <name>', 'Which spider to run')
   .option('-p, --pages <number>', 'How many pages to scrape', 2)
   .parse(process.argv);
