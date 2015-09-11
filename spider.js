@@ -22,18 +22,8 @@ function Spider(fileName){
 
     if(fileName){
 
-//        var suffix = '.json';
-//        if(fileName.indexOf(suffix, fileName.length - suffix.length) !== -1){
-//        } else if(fileName.indexOf('nsc-') === 0){
-//            fileName = fileName.substring(4);
-//        }
-
+        var instance = require(fileName);
         log('validating JSON spider:', fileName);
-        try {
-            var instance = require(fileName);
-        } catch(e) {
-            throw new Error('Require failed: \n' + e);
-        }
         var schema = require("./schemas/spider-v1.json");
         var valid = schemaValidator.validate(instance, schema);
         if(!valid) {

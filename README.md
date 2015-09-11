@@ -20,12 +20,10 @@ A spider is a json file. The structure is as such:
 }
 ```
 
-At the moment, spiders must be npm packages installed locally, with
-a name prefixed with `nsc-`. Since multiple spiders can be installed,
-one is selected like this:
+This file should be `require`able - so, 
 
 ```
-node scrape.js --wait --spider reddit
+node scrape.js --spider reddit
 ```
 
 This will run the reddit spider. By default, items from the front page will

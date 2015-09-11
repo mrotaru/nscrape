@@ -28,9 +28,9 @@ program
   .parse(process.argv);
 
 var spider_name =process.argv[2];
+program.wait = parseInt(program.wait);
 
-nconf.argv()
-     .file({file: 'config.json'});
+nconf.argv().file({file: 'config.json'});
 
 // setup logging
 var debug = require('debug');
@@ -53,14 +53,13 @@ function Scraper() {
 Scraper.prototype.getSpider = function(name){
     for (var i = 0; i < this.spiders.length; ++i){
         var sname = this.spiders[i].name;
-        if(name.indexOf('nsc-') === 0){
-            name = name.substring(4);
-        }
         if (sname === name) {
             return this.spiders[i];
         }
     }
-    return this.spiders[0];
+    if(this.spiders.length ===1) {
+        return this.spiders[0];
+    }
     return null;
 }
 
@@ -73,12 +72,10 @@ Scraper.prototype.init = function() {
         self.spiders.push(s);
     } catch (e) {
         log('could not load spider "' + program.spider + '":');
-        log(e);
     }
-    log(program.spider);
     self.spider = self.getSpider(program.spider);
-    if(!self.spider){
-        error("No such spider: " + program.spider);
+    if(!self.spiders.length){
+        error("No spiders - exiting...");
         process.exit(1);
     }
 }
