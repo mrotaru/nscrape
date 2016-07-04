@@ -1,73 +1,94 @@
 {
-    "title": "Nscr Spider",
-    "type": "object",
-    "definitions": {
-        "objDescriptor": {
-            "oneOf": [
-                {
-                "type": "object",
-                "properties": {
-                    "selector": {
-                        "type": "string"
-                    },
-                    "extract": {
-                        "enum": ["href", "text"]
-                    },
-                    "sfunction": {
-                        "type": "string"
-                    }
-                },
-                "required": ["selector"]
-            },{
-                "type": "object",
-                "properties": {
-                    "sfunction": {
-                        "type": "string"
-                    }
-                },
-                "required": ["sfunction"]
+  "title": "Nscr Spider",
+  "type": "object",
+  "definitions": {
+    "objDescriptor": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "selector": {
+              "type": "string"
+            },
+            "extract": {
+              "enum": [
+                "href",
+                "text"
+              ]
+            },
+            "sfunction": {
+              "type": "string"
             }
-            ]
+          },
+          "required": [
+            "selector"
+          ]
         },
-        "descriptor": {
-            "oneOf": [
-                { "type": "string" },
-                { "$ref": "#/definitions/objDescriptor" }
-            ]
-        },
-        "itemType": {
-            "type": "object",
-            "properties": {
-                "name":         { "type": "string" },
-                "container":    { "type": "string" },
-                "selector":     { "type": "string" },
-                "properties":   { 
-                    "type": "object",
-                    "patternProperties": {
-                        "^.*$": {
-                            "$ref" : "#/definitions/descriptor"
-                        }
-                    }
-                }
+        {
+          "type": "object",
+          "properties": {
+            "sfunction": {
+              "type": "string"
             }
+          },
+          "required": [
+            "sfunction"
+          ]
         }
+      ]
     },
-    "properties": {
+    "descriptor": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/objDescriptor"
+        }
+      ]
+    },
+    "itemType": {
+      "type": "object",
+      "properties": {
         "name": {
-            "type": "string"
+          "type": "string"
         },
-        "baseUrl": {
-            "type": "string"
+        "container": {
+          "type": "string"
         },
-        "nextUrlDescriptor": {
-            "$ref": "#/definitions/descriptor"
+        "selector": {
+          "type": "string"
         },
-        "itemTypes": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/itemType"
+        "properties": {
+          "type": "object",
+          "patternProperties": {
+            "^.*$": {
+              "$ref": "#/definitions/descriptor"
             }
+          }
         }
+      }
+    }
+  },
+  "properties": {
+    "name": {
+      "type": "string"
     },
-    "required": ["name", "itemTypes"]
+    "baseUrl": {
+      "type": "string"
+    },
+    "nextUrlDescriptor": {
+      "$ref": "#/definitions/descriptor"
+    },
+    "itemTypes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/itemType"
+      }
+    }
+  },
+  "required": [
+    "name",
+    "itemTypes"
+  ]
 }
