@@ -62,7 +62,7 @@ function _validate (spider) {
   let schema = require('./schemas/spider-v1.json')
   let valid = schemaValidator.validate(spider, schema)
   if (!valid) {
-    throw new Error(schemaValidator.getLastErrors())
+    this.state.error = schemaValidator.getLastErrors()
   }
 }
 
@@ -187,7 +187,7 @@ function getNextUrl () {
 util.inherits(Spider, EventEmitter)
 
 /**
- * Extract a property described by `descriptor` from the `ctc`
+ * Extract a property described by `descriptor` from the `ctx`
  *
  * @param {Object | String} descriptor
  * @param {Object | String} ctx
@@ -252,10 +252,7 @@ function extract (descriptor, ctx = 'body') {
           console.log('Cannot find sanitizer: ', sanitizer)
         }
       }
-    } else {
-      throw new Error('sanitizers must be array')
     }
-  } else {
   }
 
   return ret

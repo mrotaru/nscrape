@@ -1,0 +1,10 @@
+{
+  "web": false,
+  "verbose": false,
+  "debug": false,
+  "html-debug-file": false,
+  "proxy": false,
+  "wait": 500,
+  "pages": 2,
+  "insecure": false,
+}

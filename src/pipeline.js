@@ -1,55 +1,59 @@
-var util         = require("util");
-var Promise      = require("bluebird");
-var EventEmitter = require("events").EventEmitter;
-var _            = require("lodash");
+let Promise = require('bluebird')
+let EventEmitter = require('events').EventEmitter
+let _ = require('lodash')
 
-function Pipeline() {
-    EventEmitter.call(this);
-    this.name = '';
-    this.filters = [];
+let Pipeline = {
+  addPipe: addPipe,
+  process: process,
+  emitter: new EventEmitter(),
+  init: () => { this.pipes = [] }
 }
 
-util.inherits(Pipeline, EventEmitter);
+let log = require('debug')('item')
 
-var log_item = require('debug')('item');
-function consoleFilter(item){
-    if (item.__template) {
-        log_item(_.template(item.__template,item));
+let predefinedPipes = [{
+  name: 'console',
+  process: (item) => {
+    if (item.template) {
+      log(_.template(item.template, item))
     } else {
-        log_item(item.title);
+      log(item.title)
     }
-    return item;
-};
+    return Promise.resolve(item)
+  }
+}]
 
-Pipeline.prototype.use = function(filter){
-    var self = this;
-    console.log('Using filter: ' + filter)
-    if(typeof(filter) === 'function'){
-        self.filters.push(filter);
-    } else if (typeof(filter) === 'object' && filter.filter && typeof filter.filter === 'function') {
-        self.filters.push(filter.filter);
-    } else if (filter === 'console') {
-        self.filters.push(consoleFilter);
+/**
+ * Add a pipe
+ *
+ * @param {String|Object|Function} name
+ * @return {Promise<item>}
+ */
+function addPipe (name, fn) {
+  let findFn = (pipe) => pipe.name === name
+  if (!this.pipes.find(findFn)) {
+    let predefined = predefinedPipes.find(findFn)
+    if (predefined) {
+      this.pipes.push(predefined)
     } else {
-        self.load(filter);
+      if (fn && typeof fn === 'function') {
+        this.pipes.push({
+          name,
+          process: fn
+        })
+      } else if (typeof fn === 'object') {
+        this.pipes.push(name)
+      }
     }
+    this.pipes.push()
+  } else {
+    log(`Trying to load a pipe twice: ${name}`)
+  }
 }
 
-// run `item` through all filters, sequentially. Each filter receives
-// the item as returned by the previous filter. Any filter can reject the
-// item, so it will not be passed on to the other filters.
-Pipeline.prototype.process = function(item){
-    var self = this;
-    var current = Promise.cast(item);
-    for (var k = 0; k < self.filters.length; ++k) {
-        current = current.then(self.filters[k]);
-    }
-    return current;
+function process (item) {
+  return Promise(this.pipes)
+    .reduce((value, pipe) => pipe.process(value))
 }
 
-// load a filter from a file
-Pipeline.prototype.load = function(filter){
-    throw new Error('Not implemented.')
-}
-
-module.exports = Pipeline;
+module.exports = Pipeline
