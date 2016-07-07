@@ -2,14 +2,14 @@ let Promise = require('bluebird')
 let EventEmitter = require('events').EventEmitter
 let _ = require('lodash')
 
-let Pipeline = {
-  addPipe: addPipe,
-  process: process,
-  emitter: new EventEmitter(),
-  init: () => { this.pipes = [] }
-}
-
 let log = require('debug')('item')
+
+let Pipeline = {
+  init: () => { this.pipes = [] },
+  loadPipe,
+  process,
+  emitter: new EventEmitter()
+}
 
 let predefinedPipes = [{
   name: 'console',
@@ -29,7 +29,7 @@ let predefinedPipes = [{
  * @param {String|Object|Function} name
  * @return {Promise<item>}
  */
-function addPipe (name, fn) {
+function loadPipe (name, fn) {
   let findFn = (pipe) => pipe.name === name
   if (!this.pipes.find(findFn)) {
     let predefined = predefinedPipes.find(findFn)
@@ -43,6 +43,13 @@ function addPipe (name, fn) {
         })
       } else if (typeof fn === 'object') {
         this.pipes.push(name)
+      } else if (typeof name === 'string') {
+        try {
+          let pipe = require(name)
+          this.pipes.push(pipe)
+        } catch (err) {
+          log(`Failed to load pipe: ${name}`)
+        }
       }
     }
     this.pipes.push()

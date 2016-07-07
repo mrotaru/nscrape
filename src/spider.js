@@ -1,4 +1,3 @@
-let util = require('util')
 let EventEmitter = require('events').EventEmitter
 let Promise = require('bluebird')
 
@@ -17,12 +16,13 @@ let beautifyOptions = {
 }
 
 let Spider = {
-  init: init,
-  load: load,
-  process: process,
-  getNextUrl: getNextUrl,
+  init,
+  load,
+  process,
+  getNextUrl,
   addItemType: (itemType) => this.itemTypes.push(itemType),
-  hasNextUrl: () => this.hasOwnProperty('nextUrlDescriptor') || this.hasOwnProperty('nextUrl')
+  hasNextUrl: () => this.hasOwnProperty('nextUrlDescriptor') || this.hasOwnProperty('nextUrl'),
+  emitter: new EventEmitter()
 }
 
 function init (object) {
@@ -41,7 +41,7 @@ function init (object) {
   this._html = null
   this.$ = null
   this.currentPage = null
-  EventEmitter.call(this)
+  return this
 }
 
 function load (fileName) {
@@ -53,6 +53,7 @@ function load (fileName) {
     error(`failed to load spider: ${fileName}\n${err}`)
     this.state.error = err
   }
+  return this
 }
 
 function _validate (spider) {
@@ -147,7 +148,7 @@ function process (html) {
         spider.items.push(item)
       }
       if (!errored || (errored && spider.emitErrored)) {
-        spider.emit('item-scraped', item, itemType.name)
+        spider.emitter.emit('item-scraped', item, itemType.name)
       }
       if (errored) {
         itemsErrored++
@@ -183,8 +184,6 @@ function getNextUrl () {
     }
   }
 }
-
-util.inherits(Spider, EventEmitter)
 
 /**
  * Extract a property described by `descriptor` from the `ctx`

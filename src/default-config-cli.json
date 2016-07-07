@@ -1,0 +1,7 @@
+{
+  "auto-start": true,
+  "pages": 2,
+  "pipelines": [
+    "console-log"
+  ]
+} 
