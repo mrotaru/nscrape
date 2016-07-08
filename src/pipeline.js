@@ -1,3 +1,5 @@
+'use strict'
+
 let Promise = require('bluebird')
 let EventEmitter = require('events').EventEmitter
 let _ = require('lodash')
@@ -5,14 +7,14 @@ let _ = require('lodash')
 let log = require('debug')('item')
 
 let Pipeline = {
-  init: () => { this.pipes = [] },
+  init: function () { this.pipes = []; return this },
   loadPipe,
   process,
   emitter: new EventEmitter()
 }
 
 let predefinedPipes = [{
-  name: 'console',
+  name: 'console-log',
   process: (item) => {
     if (item.template) {
       log(_.template(item.template, item))
@@ -52,7 +54,6 @@ function loadPipe (name, fn) {
         }
       }
     }
-    this.pipes.push()
   } else {
     log(`Trying to load a pipe twice: ${name}`)
   }

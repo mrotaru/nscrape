@@ -1,12 +1,14 @@
+'use strict'
+
 let EventEmitter = require('events').EventEmitter
 let Promise = require('bluebird')
+let merge = require('util')._extend
 
-var beautify = require('js-beautify').html
+let beautify = require('js-beautify').html
 
-var _debug = require('debug')
-var log = _debug('spider')
-var error = _debug('spider:error')
-var debug = _debug('spider:debug')
+let debug = require('debug')
+let log = debug('spider')
+let error = debug('spider:error')
 error.log = console.error.bind(console)
 
 let beautifyOptions = {
@@ -20,21 +22,30 @@ let Spider = {
   load,
   process,
   getNextUrl,
+  pause: () => { this.state.paused = true },
+  isPaused: () => { return this.state.paused },
   addItemType: (itemType) => this.itemTypes.push(itemType),
   hasNextUrl: () => this.hasOwnProperty('nextUrlDescriptor') || this.hasOwnProperty('nextUrl'),
   emitter: new EventEmitter()
 }
 
-function init (object) {
-  // run-time options
-  this.insecure = false
-  this.emitErrored = false
-  this.pushErrored = false
+function init (config) {
+  this.config = merge({
+    insecure: false,
+    emitErrored: false,
+    pushErrored: false
+  }, config)
+
+  this.itemTypes
 
   this.state = {
     ready: false,
     error: null,
     paused: false
+  }
+
+  this.stats = {
+    scrapedPages: 0
   }
 
   this.items = {}
@@ -47,8 +58,11 @@ function init (object) {
 function load (fileName) {
   log('loading JSON spider ', fileName)
   try {
-    this.spider = require(fileName)
-    _validate(this.spider)
+    let file = require(`nsc-${fileName}`)
+    for (let prop in file) {
+      this[prop] = file[prop]
+    }
+    _validate(this)
   } catch (err) {
     error(`failed to load spider: ${fileName}\n${err}`)
     this.state.error = err
@@ -60,7 +74,7 @@ function _validate (spider) {
   log('validating JSON spider:', spider)
   let ZSchema = require('z-schema')
   let schemaValidator = new ZSchema()
-  let schema = require('./schemas/spider-v1.json')
+  let schema = require('../schemas/spider-v1.json')
   let valid = schemaValidator.validate(spider, schema)
   if (!valid) {
     this.state.error = schemaValidator.getLastErrors()
@@ -76,6 +90,9 @@ function _validate (spider) {
  */
 function process (html) {
   // load the html
+  if (!html || !html.length) {
+    return null
+  }
   log('processing %d bytes', html.length)
   let $ = this.$ = require('cheerio').load(html, {
     normalizeWhitespace: false,
@@ -191,7 +208,8 @@ function getNextUrl () {
  * @param {Object | String} descriptor
  * @param {Object | String} ctx
  */
-function extract (descriptor, ctx = 'body') {
+function extract (descriptor, _ctx) {
+  let ctx = _ctx || 'body'
   let selector = ''
   if (typeof (descriptor) === 'string') {
     selector = descriptor
@@ -211,7 +229,7 @@ function extract (descriptor, ctx = 'body') {
   let el = this.$(ctx).find(selector)
   if (!el.length) {
     if (typeof (descriptor) === 'object' && descriptor.optional) {
-      debug('optional property element not found: %s setting to null', ret)
+      log('optional property element not found: %s setting to null', ret)
       return null
     } else {
       var bhtml = beautify(this.$(ctx).html(), beautifyOptions)
