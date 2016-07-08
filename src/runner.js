@@ -1,6 +1,6 @@
 'use strict'
 
-let merge = require('merge')
+let merge = require('deep-extend')
 let Promise = require('bluebird')
 let request = Promise.promisify(require('request'))
 Promise.promisifyAll(request)
@@ -9,9 +9,10 @@ let Spider = require('./spider.js')
 let Pipeline = require('./pipeline.js')
 
 // setup logging
-var debug = require('debug')
-var error = debug('main:error')
-var info = debug('main:info')
+let debug = require('debug')
+let error = debug('runner:error')
+let info = debug('runner:info')
+
 error.log = console.error.bind(console)
 
 let Runner = {
@@ -22,7 +23,7 @@ let Runner = {
 }
 
 function init (config) {
-  this.config = merge({}, config)
+  this.config = merge({}, require('./default-config.json'), config)
   this.spiders = []
   this.pipeline = Object.create(Pipeline).init()
   for (let pipeName of config.pipes) {
@@ -31,8 +32,9 @@ function init (config) {
   for (let spiderName of config.spiders) {
     let spider = Object.create(Spider).init(config)
     spider.load(spiderName)
+    let runner = this // bind ?
     spider.emitter.on('item-scraped', function (item, itemTypeName) {
-      this.pipeline.process(item, itemTypeName)
+      runner.pipeline.process(item, itemTypeName)
     })
     this.spiders.push(spider)
   }
@@ -111,7 +113,7 @@ function fetchWithPhantom (url) {
   let phantom = require('phantom')
   phantom.create(function (phantom) {
     if (!phantom) {
-      console.log('phantom create failed')
+      error('phantom create failed')
     } else {
       phantom.createPage(function (page) {
         page.open(url, function (status) {
@@ -124,7 +126,7 @@ function fetchWithPhantom (url) {
               self.spider.parse(html)
             })
           } else {
-            console.log('error: page could not be opened')
+            error('page could not be opened')
           }
         })
       })

@@ -2,7 +2,7 @@
 
 let EventEmitter = require('events').EventEmitter
 let Promise = require('bluebird')
-let merge = require('util')._extend
+let merge = require('deep-extend')
 
 let beautify = require('js-beautify').html
 
@@ -22,6 +22,7 @@ let Spider = {
   load,
   process,
   getNextUrl,
+  extract,
   pause: () => { this.state.paused = true },
   isPaused: () => { return this.state.paused },
   addItemType: (itemType) => this.itemTypes.push(itemType),
@@ -36,7 +37,9 @@ function init (config) {
     pushErrored: false
   }, config)
 
-  this.itemTypes
+//  console.log('spider-config', this.config);
+
+  this.itemTypes = []
 
   this.state = {
     ready: false,
@@ -71,7 +74,7 @@ function load (fileName) {
 }
 
 function _validate (spider) {
-  log('validating JSON spider:', spider)
+  log('validating JSON spider:', spider.name)
   let ZSchema = require('z-schema')
   let schemaValidator = new ZSchema()
   let schema = require('../schemas/spider-v1.json')
@@ -94,6 +97,11 @@ function process (html) {
     return null
   }
   log('processing %d bytes', html.length)
+
+  if (this.config['html-debug-file']) {
+    require('fs').writeFileSync(this.config['html-debug-file'], html)
+  }
+
   let $ = this.$ = require('cheerio').load(html, {
     normalizeWhitespace: false,
     xmlMode: false,
@@ -146,7 +154,7 @@ function process (html) {
         // if we can't extract, set the property value to null, and
         // add the __errors property
         try {
-          item[prop] = extract(itemType.properties[prop], el)
+          item[prop] = spider.extract(itemType.properties[prop], el)
         } catch (e) {
           log('failed to extract: ', e)
           item[prop] = null
@@ -162,7 +170,10 @@ function process (html) {
       // items can also be emitted and/or added to the `items` array
       let errored = item.hasOwnProperty('__errors')
       if (!errored || (errored && spider.pushErrored)) {
-        spider.items.push(item)
+        if (!spider.items.hasOwnProperty(itemType.name)) {
+          spider.items[itemType.name] = []
+        }
+        spider.items[itemType.name].push(item)
       }
       if (!errored || (errored && spider.emitErrored)) {
         spider.emitter.emit('item-scraped', item, itemType.name)
@@ -266,7 +277,7 @@ function extract (descriptor, _ctx) {
         if (typeof validator[sanitizer] === 'function') {
           ret = validator[sanitizer](ret)
         } else {
-          console.log('Cannot find sanitizer: ', sanitizer)
+          error('Cannot find sanitizer: ', sanitizer)
         }
       }
     }

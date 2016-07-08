@@ -60,8 +60,8 @@ function loadPipe (name, fn) {
 }
 
 function process (item) {
-  return Promise(this.pipes)
-    .reduce((value, pipe) => pipe.process(value))
+  return Promise
+    .reduce(this.pipes, (value, pipe) => pipe.process(value), item)
 }
 
 module.exports = Pipeline

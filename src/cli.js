@@ -1,10 +1,10 @@
 let os = require('os')
-let merge = require('merge')
+let merge = require('deep-extend')
 
 let Runner = require('./runner.js')
 
 // load config - from the user's home, and then curent directory
-let config = merge(require('./default-config.json'), require('./default-config-cli.json'))
+let config = merge({}, require('./default-config-cli.json'))
 try {
   merge(config, require(`${os.homedir()}/.nscraper`))
   merge(config, require(`${__dirname}/.nscraper`))

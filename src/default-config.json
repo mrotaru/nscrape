@@ -9,5 +9,5 @@
   "spiders": [],
   "verbose": false,
   "wait": 1000,
-  "web": false,
+  "web": false
 }
