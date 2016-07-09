@@ -4,7 +4,7 @@
   "insecure": false,
   "html-debug-file": false,
   "pages": 1,
-  "pipelines": [],
+  "pipes": [],
   "proxy": false,
   "spiders": [],
   "verbose": false,

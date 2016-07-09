@@ -1,40 +1,35 @@
-There are about a dozen similar packages on `npm`. What sets this one apart ?
+# nscraper
 
-- comes with a nice CLI featuring auto-completion (see examples)
-- comes with a web interface, where you can see the fetched data from all the
-  loaded spiders
-- goes out of it's way to make it easy to create, debug and run spiders
-- well defined spider schema (using JSON-schema draft 4)
-- lazy REST server
-- easy to extend with plugins for storage
-- easy to create new spiders (they're just JSON files)
-- works with dynamic (JavaScript) websites - just set 'phantom' to true in the
-  sipder's json file. So the website will be loaded in `phantom`
-- unit tests
-- maintained
+Extract structured data from websites using "spiders".
 
-## Architecture
+A spider is a plain json file, mapping attributes to CSS selectors:
 
-### Spider
-Given HTML, it will extract items from it (emitted via events)
-
-### Runner
-Given spider names, it will load them. It will ask the spider for an URL, fetch
-it and feed the HTML to the sipder. It will also listen for the spider's `item`
-event, and run each item through the pipeline.
-
-### Pipeline
-processes items - can do stuff like print it on console, or store it in a
-database. Can also be used for custom validation logic, to reject items
+```
+{
+    "name": "reddit",
+    "baseUrl": "http://www.reddit.com/r/javascript",
+    "itemTypes": [{
+        "name": "link",
+        "container": ".linklisting",
+        "selector": ".thing",
+        "properties": {
+            "title": "a.title",
+            "votes": ".score:not(.dislikes):not(.likes)"
+        }
+    }]
+}
+```
 
 ## Usage
-From the CLI:
+
+### From the CLI
 ```
-# on the cli, defaults: pipelines: console, start()
+# load and run `nsc-reddit`, show scraped items in the command line and
+# enable the web interface
 nscraper --spiders reddit --web 
 ```
 
-Programatic:
+### Programatic
 ```
 runner = Object.create(Runner)
 runner.init({
@@ -43,3 +38,46 @@ runner.init({
   wait: 2000
 }).start()
 ```
+
+### Scraping project
+```
+$ mkidr my-spiders
+$ cd my-spiders && npm init -y
+$ npm install --save nscraper
+$ touch index.js
+$ cat index.js
+let myDb = require('some-database')
+
+runner = Object.create(Runner)
+runner.init({
+  spiders: ['reddit'],
+  pipes: ['console-log', {
+    name: 'my-db',
+    process: (item) => myDb.store(item)
+  }],
+  wait: 2000
+}).start()
+```
+
+## Architecture
+
+### Spider
+Given HTML, it will extract items from it (emitted via events)
+
+### Pipeline
+Processes scraped items - can do stuff like print it on console, or store it in a
+database. Multiple 'pipes' can be included in the pipeline; each will be
+executed in order, with the result passed on to the following pipes.
+
+### Runner
+Ties things together; given spider names, it will load them. It will ask the
+spider for an URL, fetch it and feed the HTML to the sipder. It will also listen
+for the spider's `item` event, and run each item through the pipeline.
+
+### CLI
+Command line interface
+
+### TODO
+- additional info - for ex, for a redit item, enable retrieval of additional
+  data available by opening the item's page
+- extend spider - override selectors, options for phantom, validators, etc

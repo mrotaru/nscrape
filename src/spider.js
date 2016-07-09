@@ -86,8 +86,7 @@ function _validate (spider) {
 
 /**
  * For every item type, try to extract it from the provided `html`. All
- * extracted items will be added to the internal hash, as well as emitted as an
- * event.
+ * extracted items will be added to the internal hash, as well as emitted as an * event.
  *
  * @param {String} html
  */
