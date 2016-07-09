@@ -79,11 +79,9 @@ function fetch (spider) {
 }
 
 function _fetch (url, spider) {
-  if (spider.phantom) {
-    fetchWithPhantom(url, spider)
-  } else {
-    fetchWithHttp(url, spider)
-  }
+  return spider.phantom
+    ? fetchWithPhantom(url, spider)
+    : fetchWithHttp(url, spider)
 }
 
 function fetchWithHttp (url, spider) {
@@ -111,7 +109,7 @@ function fetchWithHttp (url, spider) {
 function fetchWithPhantom (url) {
   let self = this
   let phantom = require('phantom')
-  phantom.create(function (phantom) {
+  return phantom.create(function (phantom) {
     if (!phantom) {
       error('phantom create failed')
     } else {
