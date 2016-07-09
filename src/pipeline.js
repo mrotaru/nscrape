@@ -19,7 +19,7 @@ let predefinedPipes = [{
     if (item.template) {
       log(_.template(item.template, item))
     } else {
-      log(item.title)
+      console.log(`${item.title}`)
     }
     return Promise.resolve(item)
   }
