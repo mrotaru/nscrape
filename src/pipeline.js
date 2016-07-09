@@ -43,7 +43,7 @@ function loadPipe (name, fn) {
           name,
           process: fn
         })
-      } else if (typeof fn === 'object') {
+      } else if (typeof name === 'object') {
         this.pipes.push(name)
       } else if (typeof name === 'string') {
         try {

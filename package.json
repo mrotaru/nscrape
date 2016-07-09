@@ -1,12 +1,19 @@
 {
-  "name": "nsc",
-  "version": "0.0.2",
-  "description": "Web scraper",
-  "main": "server.js",
-  "author": "mrotaru",
+  "name": "nscrape",
+  "version": "0.3.0",
+  "description": "Node scraper",
+  "author": "Mihai Rotaru <mihai.rotaru@gmx.com>",
   "bin": {
-    "nsc": "./scrape.js"
+    "nscrape": "./src/cli.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrotaru/nscrape.git"
+  },
+  "engines": {
+    "node": ">=5.x"
+  },
+  "keywords": [ "scraper", "scraping" ],
   "dependencies": {
     "bluebird": "^2.3.2",
     "cheerio": "latest",
@@ -30,5 +37,6 @@
   "devDependencies": {
     "mocha": "^1.21.4",
     "chai": "^1.9.1"
-  }
+  },
+  "license": "MIT"
 }
