@@ -2,6 +2,7 @@
 
 let merge = require('deep-extend')
 let Promise = require('bluebird')
+let util = require('util')
 let request = Promise.promisify(require('request'))
 Promise.promisifyAll(request)
 
@@ -10,8 +11,8 @@ let Pipeline = require('./pipeline.js')
 
 // setup logging
 let debug = require('debug')
-let error = debug('runner:error')
 let info = debug('runner:info')
+let error = msg => console.error(msg)
 
 error.log = console.error.bind(console)
 
@@ -28,6 +29,10 @@ function init (config) {
   this.pipeline = Object.create(Pipeline).init()
   for (let pipeName of config.pipes) {
     this.pipeline.loadPipe(pipeName)
+  }
+  if (!config.spiders || !config.spiders.length) {
+    error('No spiders loaded; exiting...')
+    process.exit(1)
   }
   for (let spiderName of config.spiders) {
     let spider = Object.create(Spider).init(config)
@@ -55,7 +60,7 @@ function start () {
 
       f(spider)
     } else {
-      error(`Spider errored: ${spider}`)
+      error(`Spider errored: ${util.inspect(spider)}`)
     }
   }
 }
