@@ -142,6 +142,9 @@ function process (html) {
     let spider = this
     itemsDom.each(function (i, el) {
       let item = {}
+      if (itemType.template) {
+        item.template = itemType.template
+      }
 
       // iterate over the properties the item should have, and try
       // to extract each of them from the DOM element

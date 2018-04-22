@@ -13,7 +13,10 @@
   "engines": {
     "node": ">=5.x"
   },
-  "keywords": [ "scraper", "scraping" ],
+  "keywords": [
+    "scraper",
+    "scraping"
+  ],
   "dependencies": {
     "bluebird": "^2.3.2",
     "cheerio": "latest",

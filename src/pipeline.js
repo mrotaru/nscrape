@@ -3,6 +3,7 @@
 let Promise = require('bluebird')
 let EventEmitter = require('events').EventEmitter
 let _ = require('lodash')
+_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 let log = require('debug')('item')
 
