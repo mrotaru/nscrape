@@ -3,6 +3,8 @@
 let EventEmitter = require('events').EventEmitter
 let Promise = require('bluebird')
 let merge = require('deep-extend')
+let path = require('path')
+let childProcess = require('child_process')
 
 let beautify = require('js-beautify').html
 
@@ -61,7 +63,8 @@ function init (config) {
 function load (fileName) {
   log('loading JSON spider ', fileName)
   try {
-    let file = require(`nsc-${fileName}`)
+    let globalPackagesPath = childProcess.execSync('npm root -g').toString().trim()
+    let file = require(path.join(globalPackagesPath, fileName))
     for (let prop in file) {
       this[prop] = file[prop]
     }
