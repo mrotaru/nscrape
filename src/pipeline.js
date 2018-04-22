@@ -18,7 +18,7 @@ let predefinedPipes = [{
   name: 'console-log',
   process: (item) => {
     if (item.template) {
-      log(_.template(item.template, item))
+      console.log(_.template(item.template, item))
     } else {
       console.log(`${item.title}`)
     }
