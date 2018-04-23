@@ -10,18 +10,19 @@ function start(scraper) {
     app.use(express.static(__dirname + '/public'));
 
     app.get('/', function (req, res) {
-        console.log(scraper.spiders);
         res.render('index', {spiders: scraper.spiders});
     })
 
-    scraper.spider.on("item-scraped", function(item){
-        io.emit("item-scraped", item);
-    });
+    scraper.spiders.forEach(spider => {
+        spider.emitter.on("item-scraped", function(item){
+            io.emit("item-scraped", item);
+        });
+    })
 
     io.on('connection', function (socket) {
         socket.on('start', function(socket){
             console.log('start from web interface');
-            scraper.scrape();
+            scraper.start();
         });
     });
 
