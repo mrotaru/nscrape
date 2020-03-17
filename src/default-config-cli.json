@@ -1,7 +1,0 @@
-{
-  "auto-start": true,
-  "pages": 2,
-  "pipes": [
-    "console-log"
-  ]
-} 
