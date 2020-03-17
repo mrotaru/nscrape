@@ -24,7 +24,7 @@
     "debug": "^2.1.0",
     "express": "^4.9.4",
     "js-beautify": "^1.5.4",
-    "tough-cookie": "^0.12.1",
+    "tough-cookie": "^2.3.3",
     "validator": "^3.22.1",
     "ws": "^7.2.3",
     "z-schema": "^3.17.0"
