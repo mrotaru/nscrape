@@ -1,20 +1,19 @@
-# nscrape-daemon
+# nscrape
 
-WIP: Basic scraping daemon - takes user-defined spiders as input, which describe how to extract the data. Each spider can define multiple item types, and each scraped item will be emitted via websockets. Starts scraping as soon as at least one client connects to the websockets endpoint.
+Extract structured data from HTML.
 
-## Design
+## Using the CLI (Non-Interactive)
+- `$ npm install -g nscrape`
+- write a spider (see below) for a particular website
+- `$ nscrape --spider my-spider.json --wait 3000 --nr-of-pages 1`
+- scraped items will be printed on stdout as JSON
 
-The daemon loads spiders; spiders specify how requests are to be made
-- runner
-  - loads and runs spiders
-  - schedules fetch - fetches HTML via `fetch` or `puppeteer`
-- spider - extracts structured data from HTML
+## Using gRPC (WIP)
+- TODO: include a `persist-protobuf` server implementation for interactive use
+- mv to different project ?
 
-Usage:
-
-```sh
-$ npm install -g nscrape
-
+## Spider
+```
 $ tee ./spider-reddit.json <<EOF
 {
     "name": "reddit-js",
@@ -30,6 +29,4 @@ $ tee ./spider-reddit.json <<EOF
     }]
 }
 EOF
-
-$ nscrape --spiders ./spider-reddit
 ```

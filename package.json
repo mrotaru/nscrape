@@ -18,10 +18,13 @@
     "scraping"
   ],
   "dependencies": {
+    "@grpc/grpc-js": "^1.0.3",
+    "@grpc/proto-loader": "^0.5.4",
     "axios": "^0.19.2",
     "cheerio": "latest",
     "commander": "^5.0.0",
     "debug": "^2.1.0",
+    "deepmerge": "^4.2.2",
     "express": "^4.9.4",
     "js-beautify": "^1.5.4",
     "tough-cookie": "^2.3.3",
