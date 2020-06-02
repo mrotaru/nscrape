@@ -3,6 +3,8 @@
 "use strict";
 
 const os = require("os");
+const fs = require("fs").promises;
+const axios = require("axios");
 
 const { Logger, LogLevels } = require("./logger");
 const { Spider } = require("./spider");
@@ -18,7 +20,8 @@ let cli = require("commander")
   .option("--show-info", "Verbose output", false)
   .option("--show-debug", "Show debugging information - most verbose output", false)
   .option("-v, --verbose", "Verbose output (same as --show-debug)", false)
-  .option("--html-debug-file", "Store html causing errors in files", false)
+  .option("--dump-html", "Store the last fetched HTML as a file", false)
+  .option("--reuse-html", "Reuse the previously downloaded HTML", false)
   .parse(process.argv);
 
 let logLevel = LogLevels.ERROR;
@@ -26,29 +29,39 @@ logLevel = cli.showWarnings && LogLevels.WARNING || LogLevels.ERROR;
 logLevel = cli.showInfo && LogLevels.INFO || LogLevels.WARNING;
 logLevel = cli.showDebug && LogLevels.DEBUG || LogLevels.INFO;
 
+const dumpFileName = "./html-dump.html"
+
 const logger = new Logger("cli", logLevel);
 
 const run = async () => {
   logger.info("starting up...");
-  console.log(cli)
 
-  const spider = new Spider(cli.spider);
-
-  if (!spider.paged) {
-    throw new Error("Only paged sites supported.")
-  }
+  const json = await fs.readFile(cli.spider, { encoding: "utf8"});
+  const spider = new Spider(JSON.parse(json));
 
   let processedPages = 0
   while (processedPages < cli.nrOfPages) {
     const url = spider.getNextUrl();
-    logger.info(`Downloading ${url}...`)
-    const html = await axios.get(url);
+    let html;
+    if (cli.reuseHtml) {
+      logger.info(`loading HTML from ${url}...`)
+      html = await fs.readFile(dumpFileName, { encoding: "utf8" });
+    } else {
+      logger.info(`downloading ${url}...`)
+      const response = await axios.get(url);
+      html = response.data;
+      if (cli.dumpHtml) {
+        await fs.writeFile(dumpFileName, html);
+      }
+    }
     const items = spider.extract(html);
     console.log(items);
     processedPages++;
-    logger.info(`Waiting ${cli.wait}ms...`)
+    logger.info(`waiting ${cli.wait}ms...`)
     await delay(cli.wait);
   }
 }
 
-run();
+run().catch(err => {
+  console.error("Error: ", err);
+});

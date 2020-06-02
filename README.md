@@ -17,14 +17,16 @@ Extract structured data from HTML.
 $ tee ./spider-reddit.json <<EOF
 {
     "name": "reddit-js",
-    "baseUrl": "http://www.reddit.com/r/javascript",
+    "paged": true,
+    "baseUrl": "https://www.reddit.com/r/javascript",
     "itemTypes": [{
-        "name": "link",
-        "container": ".linklisting",
-        "selector": ".thing",
+        "name": "NewsItem",
+        "selector": ".Post",
         "properties": {
-            "title": "a.title",
-            "votes": ".score:not(.dislikes):not(.likes)"
+            "title": "h3",
+            "votes": {
+              "xpath": "child::*[1]"
+            }
         }
     }]
 }

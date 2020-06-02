@@ -1,0 +1,15 @@
+{
+    "name": "reddit-js",
+    "paged": true,
+    "baseUrl": "https://www.reddit.com/r/javascript",
+    "itemTypes": [{
+        "name": "NewsItem",
+        "selector": ".Post",
+        "properties": {
+            "title": "h3",
+            "votes": {
+              "xpath": "child::*[1]"
+            }
+        }
+    }]
+}
