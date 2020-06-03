@@ -40,7 +40,7 @@ class Spider {
           let hash = this._hashItem(item);
           if (hash === this._lastHash) {
             this._logger.info(`returning items starting with ${i} (hash: ${this._lastHash})`);
-            returnedItems = allItems.slice(i);
+            returnedItems = allItems.slice(i + 1);
             break;
           }
         }

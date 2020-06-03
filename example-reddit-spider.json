@@ -9,7 +9,10 @@
         "name": "NewsItem",
         "selector": ".Post",
         "properties": {
-            "title": "h3",
+            "title": {
+                "selector": "h3",
+                "required": true
+            },
             "votes": {
               "xpath": "child::*[1]"
             }
