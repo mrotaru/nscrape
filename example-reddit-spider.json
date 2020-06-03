@@ -1,6 +1,9 @@
 {
     "name": "reddit-js",
-    "paged": true,
+    "infinite-scrolling": true,
+    "headless-config": {
+        "wait-milliseconds": "1000"
+    },
     "baseUrl": "https://www.reddit.com/r/javascript",
     "itemTypes": [{
         "name": "NewsItem",

@@ -27,10 +27,15 @@
     "deepmerge": "^4.2.2",
     "express": "^4.9.4",
     "js-beautify": "^1.5.4",
+    "objects-from-html": "git+https://git@github.com/mrotaru/objects-from-html.git",
+    "puppeteer-core": "^3.3.0",
     "tough-cookie": "^2.3.3",
     "validator": "^3.22.1",
     "ws": "^7.2.3",
     "z-schema": "^3.17.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "playwright-webkit": "^1.0.2"
+  }
 }
