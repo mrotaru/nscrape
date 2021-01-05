@@ -20,7 +20,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.0.3",
     "@grpc/proto-loader": "^0.5.4",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cheerio": "latest",
     "commander": "^5.0.0",
     "debug": "^2.1.0",
