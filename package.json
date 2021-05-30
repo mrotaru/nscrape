@@ -31,7 +31,7 @@
     "puppeteer-core": "^3.3.0",
     "tough-cookie": "^2.3.3",
     "validator": "^3.22.1",
-    "ws": "^7.2.3",
+    "ws": "^7.4.6",
     "z-schema": "^3.17.0"
   },
   "license": "MIT",
