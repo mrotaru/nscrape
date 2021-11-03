@@ -30,7 +30,7 @@
     "objects-from-html": "git+https://git@github.com/mrotaru/objects-from-html.git",
     "puppeteer-core": "^3.3.0",
     "tough-cookie": "^2.3.3",
-    "validator": "^3.22.1",
+    "validator": "^13.7.0",
     "ws": "^7.2.3",
     "z-schema": "^3.17.0"
   },
